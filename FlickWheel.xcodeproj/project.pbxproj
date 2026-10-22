@@ -1,0 +1,585 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		01A36C7A9FC0AD0C5784733E /* AnnotatedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D152D3F7FDF4E27749E6A00 /* AnnotatedImageView.swift */; };
+		058CE4118399ECBF9734E628 /* ImageCropper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55E24EA8C403B20A8B6AC03B /* ImageCropper.swift */; };
+		072A7ED941559BCB97AB3545 /* AnnotationTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF4FAEF2EB1FB622957037C /* AnnotationTool.swift */; };
+		07514CE03988D9EAB274907B /* BackgroundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A35F53BFE1E809F7ABAC2ADC /* BackgroundModel.swift */; };
+		0E0D6AA721EB36B8D9DEF2F1 /* Backdrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B80A380B9746B2B0DBBAB9A /* Backdrop.swift */; };
+		12AA8F0ED5D41A9AFA471DF5 /* BackgroundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A35F53BFE1E809F7ABAC2ADC /* BackgroundModel.swift */; };
+		232EBB2A7612DA6C11DE3D5E /* BackgroundModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A541BEB9124B79237C2505A /* BackgroundModelTests.swift */; };
+		38A7326E494AB7E080C8CC76 /* AnnotationTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF4FAEF2EB1FB622957037C /* AnnotationTool.swift */; };
+		411B574F408B19112FD930F8 /* ActionRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA50A3DE49AD9692A966E735 /* ActionRegistry.swift */; };
+		48A0DE6F5DD9BD124FE9D5BF /* AnnotateModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF014555FB60FCA619ABA6F /* AnnotateModelTests.swift */; };
+		52857D46EA185118E3728209 /* ActionRegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72312113BDA7ECFE28614F62 /* ActionRegistryTests.swift */; };
+		54D02FF427D7DF0EF03F1059 /* RadialWheelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C45342D039E93DE9FF9EE62 /* RadialWheelView.swift */; };
+		5C4E4883D10DC353DE077EA4 /* ImageCropperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46BD80A6BFDB5C9B26AEA2DF /* ImageCropperTests.swift */; };
+		616CEB021C8FBAA97D113171 /* Backdrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B80A380B9746B2B0DBBAB9A /* Backdrop.swift */; };
+		664245E210ECE4CE3FC66861 /* BackgroundRatio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C034E5076AA8BADF5CF747 /* BackgroundRatio.swift */; };
+		6A2F1EB90A4641CAAF8C7327 /* BackgroundRatio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C034E5076AA8BADF5CF747 /* BackgroundRatio.swift */; };
+		71D172F631D806E631D58516 /* ActionRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90EF8721067F19768745A2D9 /* ActionRunner.swift */; };
+		71FF9BF9EFD195788BC7A85B /* WheelAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF33012E87F92646A1E62260 /* WheelAction.swift */; };
+		7393BEB36DFE8409DF0C324D /* ActionRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90EF8721067F19768745A2D9 /* ActionRunner.swift */; };
+		741961F8DB0CE46FB3A35349 /* AnnotateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74B26D21EE56B02E061561C /* AnnotateView.swift */; };
+		7768103BC80F15E428A6711F /* DragKeyMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4FC8215BC36B6BA288E640 /* DragKeyMonitor.swift */; };
+		7DBCC2034C04850CDD6074F7 /* ActionRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7D637E98D864310222EBC3 /* ActionRunnerTests.swift */; };
+		7FA96D3337AC137AC5165B40 /* CropRatio.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF33117B8231AEE09B12BD6C /* CropRatio.swift */; };
+		822BDDC81DB9EC84F3ED2813 /* WheelAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF33012E87F92646A1E62260 /* WheelAction.swift */; };
+		869E85F20CD18E493B6B8EA8 /* CropRatio.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF33117B8231AEE09B12BD6C /* CropRatio.swift */; };
+		8810095D95B29BE8E2B9D55D /* AnnotateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32ED63EC280970BFC3F46574 /* AnnotateModel.swift */; };
+		8965A3EE016A9E7D56BDA8C1 /* ActionRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA50A3DE49AD9692A966E735 /* ActionRegistry.swift */; };
+		99E692361F4DB59A6D04D835 /* BackgroundWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB21CAAB3F578B100D56AD3 /* BackgroundWindowController.swift */; };
+		A213CF90FDDC4C4780B5E84C /* AnnotateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32ED63EC280970BFC3F46574 /* AnnotateModel.swift */; };
+		A921B49D2F69632DB7731390 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68E43ACDF5AE308E69C92AF6 /* Annotation.swift */; };
+		AB88921839FD09A0D4CB1CD8 /* FlickWheelApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033DAD51402FFC8A6133EFF4 /* FlickWheelApp.swift */; };
+		B188FB044F3A8507F365E866 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68E43ACDF5AE308E69C92AF6 /* Annotation.swift */; };
+		B68810FD4BD315D66A1525CD /* BackgroundRenderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA6C51F608310B908BBA59AE /* BackgroundRenderView.swift */; };
+		BCD7912064A24D7D4F358C4D /* CropModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F900D8D5DB332762F387B0 /* CropModel.swift */; };
+		C815ADE8A8FE6ECD90A2ADCD /* WheelDropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A21C1DCE48C18AC244AA2 /* WheelDropView.swift */; };
+		CE08C849046C7E32D0C2A489 /* CropModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FD5C01B480927EA2956E93 /* CropModelTests.swift */; };
+		D66F6C32CAFC879F10D372FB /* AirDropSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0821896F50C169218ED81DD3 /* AirDropSender.swift */; };
+		D7991FA03F37A73A48A96B28 /* WheelPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D93F8D0F04BD7FF6B36E5D /* WheelPanelController.swift */; };
+		D947BC0A07182AE6F4A966A7 /* CropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F7F3A08D07ECF8EEA46253 /* CropView.swift */; };
+		DC5C2EAD3ADB591A5FFD894F /* CropWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64946CE364570802E27B9BE1 /* CropWindowController.swift */; };
+		E313253A95481727D8560F67 /* CropModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F900D8D5DB332762F387B0 /* CropModel.swift */; };
+		E7F8356A8C708A01A5E73754 /* AnnotateWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B2C32D5710C0F9DB749DF9 /* AnnotateWindowController.swift */; };
+		FA71123BE7147C51F5C76E6F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA98BDE913DDFFDCC16CC37E /* AppDelegate.swift */; };
+		FB5AF48AF175D7EB176EC469 /* BackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B6093C730D8C4A8AD2CF542 /* BackgroundView.swift */; };
+		FD87D1EF835800F9602FD372 /* ImageCropper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55E24EA8C403B20A8B6AC03B /* ImageCropper.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		00C034E5076AA8BADF5CF747 /* BackgroundRatio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRatio.swift; sourceTree = "<group>"; };
+		033DAD51402FFC8A6133EFF4 /* FlickWheelApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickWheelApp.swift; sourceTree = "<group>"; };
+		0821896F50C169218ED81DD3 /* AirDropSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirDropSender.swift; sourceTree = "<group>"; };
+		0A541BEB9124B79237C2505A /* BackgroundModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundModelTests.swift; sourceTree = "<group>"; };
+		1CC8BF8DC164812776CD0AAC /* FlickWheel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlickWheel.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2B6093C730D8C4A8AD2CF542 /* BackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView.swift; sourceTree = "<group>"; };
+		32ED63EC280970BFC3F46574 /* AnnotateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotateModel.swift; sourceTree = "<group>"; };
+		3A4FC8215BC36B6BA288E640 /* DragKeyMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragKeyMonitor.swift; sourceTree = "<group>"; };
+		46BD80A6BFDB5C9B26AEA2DF /* ImageCropperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropperTests.swift; sourceTree = "<group>"; };
+		55E24EA8C403B20A8B6AC03B /* ImageCropper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropper.swift; sourceTree = "<group>"; };
+		57FD5C01B480927EA2956E93 /* CropModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropModelTests.swift; sourceTree = "<group>"; };
+		5B7D637E98D864310222EBC3 /* ActionRunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionRunnerTests.swift; sourceTree = "<group>"; };
+		63D93F8D0F04BD7FF6B36E5D /* WheelPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WheelPanelController.swift; sourceTree = "<group>"; };
+		64946CE364570802E27B9BE1 /* CropWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropWindowController.swift; sourceTree = "<group>"; };
+		68E43ACDF5AE308E69C92AF6 /* Annotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
+		6B80A380B9746B2B0DBBAB9A /* Backdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backdrop.swift; sourceTree = "<group>"; };
+		6C45342D039E93DE9FF9EE62 /* RadialWheelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadialWheelView.swift; sourceTree = "<group>"; };
+		6CF0A5BC936422A3751E1C17 /* FlickWheelTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlickWheelTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6D152D3F7FDF4E27749E6A00 /* AnnotatedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotatedImageView.swift; sourceTree = "<group>"; };
+		70F900D8D5DB332762F387B0 /* CropModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropModel.swift; sourceTree = "<group>"; };
+		72312113BDA7ECFE28614F62 /* ActionRegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionRegistryTests.swift; sourceTree = "<group>"; };
+		90EF8721067F19768745A2D9 /* ActionRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionRunner.swift; sourceTree = "<group>"; };
+		998A21C1DCE48C18AC244AA2 /* WheelDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WheelDropView.swift; sourceTree = "<group>"; };
+		9AF014555FB60FCA619ABA6F /* AnnotateModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotateModelTests.swift; sourceTree = "<group>"; };
+		A35F53BFE1E809F7ABAC2ADC /* BackgroundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundModel.swift; sourceTree = "<group>"; };
+		A74B26D21EE56B02E061561C /* AnnotateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotateView.swift; sourceTree = "<group>"; };
+		AA50A3DE49AD9692A966E735 /* ActionRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionRegistry.swift; sourceTree = "<group>"; };
+		AAF4FAEF2EB1FB622957037C /* AnnotationTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationTool.swift; sourceTree = "<group>"; };
+		AF33117B8231AEE09B12BD6C /* CropRatio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropRatio.swift; sourceTree = "<group>"; };
+		B0B2C32D5710C0F9DB749DF9 /* AnnotateWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotateWindowController.swift; sourceTree = "<group>"; };
+		CA6C51F608310B908BBA59AE /* BackgroundRenderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRenderView.swift; sourceTree = "<group>"; };
+		CF33012E87F92646A1E62260 /* WheelAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WheelAction.swift; sourceTree = "<group>"; };
+		D6F7F3A08D07ECF8EEA46253 /* CropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropView.swift; sourceTree = "<group>"; };
+		DFB21CAAB3F578B100D56AD3 /* BackgroundWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundWindowController.swift; sourceTree = "<group>"; };
+		EA98BDE913DDFFDCC16CC37E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0A0E077908E2AB98520059EC /* FlickWheelTests */ = {
+			isa = PBXGroup;
+			children = (
+				72312113BDA7ECFE28614F62 /* ActionRegistryTests.swift */,
+				5B7D637E98D864310222EBC3 /* ActionRunnerTests.swift */,
+				9AF014555FB60FCA619ABA6F /* AnnotateModelTests.swift */,
+				0A541BEB9124B79237C2505A /* BackgroundModelTests.swift */,
+				57FD5C01B480927EA2956E93 /* CropModelTests.swift */,
+				46BD80A6BFDB5C9B26AEA2DF /* ImageCropperTests.swift */,
+			);
+			path = FlickWheelTests;
+			sourceTree = "<group>";
+		};
+		1186277981A71F3CD83B5500 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1CC8BF8DC164812776CD0AAC /* FlickWheel.app */,
+				6CF0A5BC936422A3751E1C17 /* FlickWheelTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1BB7ED864587F6F535807EBC = {
+			isa = PBXGroup;
+			children = (
+				A04B04B6AA4566F9AA17B47B /* FlickWheel */,
+				0A0E077908E2AB98520059EC /* FlickWheelTests */,
+				1186277981A71F3CD83B5500 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		46F68314C5F1999BD158B750 /* Crop */ = {
+			isa = PBXGroup;
+			children = (
+				70F900D8D5DB332762F387B0 /* CropModel.swift */,
+				AF33117B8231AEE09B12BD6C /* CropRatio.swift */,
+				D6F7F3A08D07ECF8EEA46253 /* CropView.swift */,
+				64946CE364570802E27B9BE1 /* CropWindowController.swift */,
+				55E24EA8C403B20A8B6AC03B /* ImageCropper.swift */,
+			);
+			path = Crop;
+			sourceTree = "<group>";
+		};
+		4839C19F5232102455E62D41 /* Annotate */ = {
+			isa = PBXGroup;
+			children = (
+				6D152D3F7FDF4E27749E6A00 /* AnnotatedImageView.swift */,
+				32ED63EC280970BFC3F46574 /* AnnotateModel.swift */,
+				A74B26D21EE56B02E061561C /* AnnotateView.swift */,
+				B0B2C32D5710C0F9DB749DF9 /* AnnotateWindowController.swift */,
+				68E43ACDF5AE308E69C92AF6 /* Annotation.swift */,
+				AAF4FAEF2EB1FB622957037C /* AnnotationTool.swift */,
+			);
+			path = Annotate;
+			sourceTree = "<group>";
+		};
+		998E6DB645B296490B3B5E78 /* Background */ = {
+			isa = PBXGroup;
+			children = (
+				6B80A380B9746B2B0DBBAB9A /* Backdrop.swift */,
+				A35F53BFE1E809F7ABAC2ADC /* BackgroundModel.swift */,
+				00C034E5076AA8BADF5CF747 /* BackgroundRatio.swift */,
+				CA6C51F608310B908BBA59AE /* BackgroundRenderView.swift */,
+				2B6093C730D8C4A8AD2CF542 /* BackgroundView.swift */,
+				DFB21CAAB3F578B100D56AD3 /* BackgroundWindowController.swift */,
+			);
+			path = Background;
+			sourceTree = "<group>";
+		};
+		A04B04B6AA4566F9AA17B47B /* FlickWheel */ = {
+			isa = PBXGroup;
+			children = (
+				CC559D7A5E2313D757F9B0B3 /* Actions */,
+				E9CD26741FCCD6412FB65E7F /* AirDrop */,
+				4839C19F5232102455E62D41 /* Annotate */,
+				AE99A90E67B03B0ADD3197FE /* App */,
+				998E6DB645B296490B3B5E78 /* Background */,
+				46F68314C5F1999BD158B750 /* Crop */,
+				F8046CD68D36842A179C49C4 /* Drag */,
+				B67EDC7F44E125875F2B470D /* Wheel */,
+			);
+			path = FlickWheel;
+			sourceTree = "<group>";
+		};
+		AE99A90E67B03B0ADD3197FE /* App */ = {
+			isa = PBXGroup;
+			children = (
+				EA98BDE913DDFFDCC16CC37E /* AppDelegate.swift */,
+				033DAD51402FFC8A6133EFF4 /* FlickWheelApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		B67EDC7F44E125875F2B470D /* Wheel */ = {
+			isa = PBXGroup;
+			children = (
+				6C45342D039E93DE9FF9EE62 /* RadialWheelView.swift */,
+				998A21C1DCE48C18AC244AA2 /* WheelDropView.swift */,
+				63D93F8D0F04BD7FF6B36E5D /* WheelPanelController.swift */,
+			);
+			path = Wheel;
+			sourceTree = "<group>";
+		};
+		CC559D7A5E2313D757F9B0B3 /* Actions */ = {
+			isa = PBXGroup;
+			children = (
+				AA50A3DE49AD9692A966E735 /* ActionRegistry.swift */,
+				90EF8721067F19768745A2D9 /* ActionRunner.swift */,
+				CF33012E87F92646A1E62260 /* WheelAction.swift */,
+			);
+			path = Actions;
+			sourceTree = "<group>";
+		};
+		E9CD26741FCCD6412FB65E7F /* AirDrop */ = {
+			isa = PBXGroup;
+			children = (
+				0821896F50C169218ED81DD3 /* AirDropSender.swift */,
+			);
+			path = AirDrop;
+			sourceTree = "<group>";
+		};
+		F8046CD68D36842A179C49C4 /* Drag */ = {
+			isa = PBXGroup;
+			children = (
+				3A4FC8215BC36B6BA288E640 /* DragKeyMonitor.swift */,
+			);
+			path = Drag;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		20FFDD89ED3738EB591A725B /* FlickWheelTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7D264432EF7CC205ED51B750 /* Build configuration list for PBXNativeTarget "FlickWheelTests" */;
+			buildPhases = (
+				91AF9EF0D7FEDCAA3C845BAA /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FlickWheelTests;
+			packageProductDependencies = (
+			);
+			productName = FlickWheelTests;
+			productReference = 6CF0A5BC936422A3751E1C17 /* FlickWheelTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7A22C9398CF4AEB17F186656 /* FlickWheel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 41E343455122F842B4B181C2 /* Build configuration list for PBXNativeTarget "FlickWheel" */;
+			buildPhases = (
+				364A1C5261D9442F3296FD66 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FlickWheel;
+			packageProductDependencies = (
+			);
+			productName = FlickWheel;
+			productReference = 1CC8BF8DC164812776CD0AAC /* FlickWheel.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FB0E458A6AE5577E563E6872 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					7A22C9398CF4AEB17F186656 = {
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 660033BF84FFCB7A4A988B7A /* Build configuration list for PBXProject "FlickWheel" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 1BB7ED864587F6F535807EBC;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1186277981A71F3CD83B5500 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7A22C9398CF4AEB17F186656 /* FlickWheel */,
+				20FFDD89ED3738EB591A725B /* FlickWheelTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		364A1C5261D9442F3296FD66 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				411B574F408B19112FD930F8 /* ActionRegistry.swift in Sources */,
+				7393BEB36DFE8409DF0C324D /* ActionRunner.swift in Sources */,
+				D66F6C32CAFC879F10D372FB /* AirDropSender.swift in Sources */,
+				A213CF90FDDC4C4780B5E84C /* AnnotateModel.swift in Sources */,
+				741961F8DB0CE46FB3A35349 /* AnnotateView.swift in Sources */,
+				E7F8356A8C708A01A5E73754 /* AnnotateWindowController.swift in Sources */,
+				01A36C7A9FC0AD0C5784733E /* AnnotatedImageView.swift in Sources */,
+				A921B49D2F69632DB7731390 /* Annotation.swift in Sources */,
+				38A7326E494AB7E080C8CC76 /* AnnotationTool.swift in Sources */,
+				FA71123BE7147C51F5C76E6F /* AppDelegate.swift in Sources */,
+				616CEB021C8FBAA97D113171 /* Backdrop.swift in Sources */,
+				12AA8F0ED5D41A9AFA471DF5 /* BackgroundModel.swift in Sources */,
+				6A2F1EB90A4641CAAF8C7327 /* BackgroundRatio.swift in Sources */,
+				B68810FD4BD315D66A1525CD /* BackgroundRenderView.swift in Sources */,
+				FB5AF48AF175D7EB176EC469 /* BackgroundView.swift in Sources */,
+				99E692361F4DB59A6D04D835 /* BackgroundWindowController.swift in Sources */,
+				BCD7912064A24D7D4F358C4D /* CropModel.swift in Sources */,
+				7FA96D3337AC137AC5165B40 /* CropRatio.swift in Sources */,
+				D947BC0A07182AE6F4A966A7 /* CropView.swift in Sources */,
+				DC5C2EAD3ADB591A5FFD894F /* CropWindowController.swift in Sources */,
+				7768103BC80F15E428A6711F /* DragKeyMonitor.swift in Sources */,
+				AB88921839FD09A0D4CB1CD8 /* FlickWheelApp.swift in Sources */,
+				058CE4118399ECBF9734E628 /* ImageCropper.swift in Sources */,
+				54D02FF427D7DF0EF03F1059 /* RadialWheelView.swift in Sources */,
+				71FF9BF9EFD195788BC7A85B /* WheelAction.swift in Sources */,
+				C815ADE8A8FE6ECD90A2ADCD /* WheelDropView.swift in Sources */,
+				D7991FA03F37A73A48A96B28 /* WheelPanelController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		91AF9EF0D7FEDCAA3C845BAA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8965A3EE016A9E7D56BDA8C1 /* ActionRegistry.swift in Sources */,
+				52857D46EA185118E3728209 /* ActionRegistryTests.swift in Sources */,
+				71D172F631D806E631D58516 /* ActionRunner.swift in Sources */,
+				7DBCC2034C04850CDD6074F7 /* ActionRunnerTests.swift in Sources */,
+				8810095D95B29BE8E2B9D55D /* AnnotateModel.swift in Sources */,
+				48A0DE6F5DD9BD124FE9D5BF /* AnnotateModelTests.swift in Sources */,
+				B188FB044F3A8507F365E866 /* Annotation.swift in Sources */,
+				072A7ED941559BCB97AB3545 /* AnnotationTool.swift in Sources */,
+				0E0D6AA721EB36B8D9DEF2F1 /* Backdrop.swift in Sources */,
+				07514CE03988D9EAB274907B /* BackgroundModel.swift in Sources */,
+				232EBB2A7612DA6C11DE3D5E /* BackgroundModelTests.swift in Sources */,
+				664245E210ECE4CE3FC66861 /* BackgroundRatio.swift in Sources */,
+				E313253A95481727D8560F67 /* CropModel.swift in Sources */,
+				CE08C849046C7E32D0C2A489 /* CropModelTests.swift in Sources */,
+				869E85F20CD18E493B6B8EA8 /* CropRatio.swift in Sources */,
+				FD87D1EF835800F9602FD372 /* ImageCropper.swift in Sources */,
+				5C4E4883D10DC353DE077EA4 /* ImageCropperTests.swift in Sources */,
+				822BDDC81DB9EC84F3ED2813 /* WheelAction.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DB9E99A4FD49163A4E94BC4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = targeted;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		38CE5B5FE9AD65E2BC621126 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.baoduongg.flickwheel.tests;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		6A010C3BBED83F00036EA75D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.baoduongg.flickwheel.tests;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		AD8DA4DF66505450559C963C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = targeted;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		BF366697D857643B5E20895A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = FlickWheel/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.baoduongg.flickwheel;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		DC75DA29A356119F080BD780 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = FlickWheel/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.baoduongg.flickwheel;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		41E343455122F842B4B181C2 /* Build configuration list for PBXNativeTarget "FlickWheel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF366697D857643B5E20895A /* Debug */,
+				DC75DA29A356119F080BD780 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		660033BF84FFCB7A4A988B7A /* Build configuration list for PBXProject "FlickWheel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DB9E99A4FD49163A4E94BC4 /* Debug */,
+				AD8DA4DF66505450559C963C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7D264432EF7CC205ED51B750 /* Build configuration list for PBXNativeTarget "FlickWheelTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A010C3BBED83F00036EA75D /* Debug */,
+				38CE5B5FE9AD65E2BC621126 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FB0E458A6AE5577E563E6872 /* Project object */;
+}

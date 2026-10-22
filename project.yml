@@ -1,0 +1,58 @@
+name: FlickWheel
+options:
+  deploymentTarget:
+    macOS: "13.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    SWIFT_STRICT_CONCURRENCY: targeted
+    ARCHS: arm64
+targets:
+  FlickWheel:
+    type: application
+    platform: macOS
+    sources:
+      - path: FlickWheel
+        excludes:
+          - Resources/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.baoduongg.flickwheel
+        INFOPLIST_FILE: FlickWheel/Resources/Info.plist
+        ENABLE_HARDENED_RUNTIME: NO
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+  FlickWheelTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - FlickWheelTests
+      - FlickWheel/Actions
+      - path: FlickWheel/Crop
+        includes:
+          - CropModel.swift
+          - CropRatio.swift
+          - ImageCropper.swift
+      - path: FlickWheel/Annotate
+        includes:
+          - AnnotationTool.swift
+          - Annotation.swift
+          - AnnotateModel.swift
+      - path: FlickWheel/Background
+        includes:
+          - Backdrop.swift
+          - BackgroundModel.swift
+          - BackgroundRatio.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.baoduongg.flickwheel.tests
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_IDENTITY: "-"
+schemes:
+  FlickWheel:
+    build:
+      targets:
+        FlickWheel: all
+    test:
+      targets:
+        - FlickWheelTests

@@ -1,0 +1,47 @@
+[
+  { "id": "img-webp", "label": "WebP", "wheel": "shift", "accepts": ["png","jpg","jpeg","heic","tiff"], "command": "ffmpeg -y -i \"$INPUT\" -c:v libwebp -quality 80 \"$DIR/$NAME.webp\"" },
+  { "id": "img-avif", "label": "AVIF", "wheel": "shift", "accepts": ["png","jpg","jpeg"], "command": "avifenc -q 60 \"$INPUT\" \"$DIR/$NAME.avif\"" },
+  { "id": "img-jpg", "label": "JPG", "wheel": "shift", "accepts": ["png","heic","webp","tiff"], "command": "sips -s format jpeg -s formatOptions 85 \"$INPUT\" --out \"$DIR/$NAME.jpg\"" },
+  { "id": "img-png", "label": "PNG", "wheel": "shift", "accepts": ["jpg","jpeg","heic","webp","tiff"], "command": "sips -s format png \"$INPUT\" --out \"$DIR/$NAME.png\"" },
+  { "id": "img-pdf", "label": "PDF", "wheel": "shift", "accepts": ["png","jpg","jpeg","heic"], "command": "sips -s format pdf \"$INPUT\" --out \"$DIR/$NAME.pdf\"" },
+  { "id": "svg-tsx", "label": "React TSX", "wheel": "shift", "accepts": ["svg"], "command": "npx -y @svgr/cli --typescript --icon --jsx-runtime automatic --out-dir \"$DIR\" \"$INPUT\"" },
+
+  { "id": "img-compress-png", "label": "Nén PNG", "wheel": "command", "accepts": ["png"], "command": "pngquant --quality=65-85 --force --output \"$DIR/$NAME.min.png\" \"$INPUT\"" },
+  { "id": "img-srcset", "label": "srcset 640/1280/1920", "wheel": "command", "accepts": ["png","jpg","jpeg","webp"], "command": "for w in 640 1280 1920; do sips --resampleWidth $w \"$INPUT\" --out \"$DIR/$NAME-$w.${INPUT##*.}\"; done" },
+  { "id": "img-strip-exif", "label": "Xoá metadata", "wheel": "command", "accepts": ["jpg","jpeg","png","heic","webp"], "command": "exiftool -all= -o \"$DIR/$NAME-clean.${INPUT##*.}\" \"$INPUT\"" },
+  { "id": "img-favicon", "label": "Favicon set", "wheel": "command", "accepts": ["png"], "command": "magick \"$INPUT\" -background none -define icon:auto-resize=16,32,48 \"$DIR/favicon.ico\" && for s in 180 192 512; do sips -z $s $s \"$INPUT\" --out \"$DIR/icon-$s.png\"; done" },
+  { "id": "img-palette", "label": "Copy palette", "wheel": "command", "accepts": ["png","jpg","jpeg","webp"], "command": "magick \"$INPUT\" -resize 200x200 -colors 6 -unique-colors txt:- | grep -oE '#[0-9A-Fa-f]{6}' | head -6 | paste -sd ' ' - | pbcopy" },
+  { "id": "img-pixel-4x", "label": "Pixel art 4x", "wheel": "command", "accepts": ["png"], "command": "magick \"$INPUT\" -filter point -resize 400% \"$DIR/$NAME@4x.png\"" },
+  { "id": "svg-optimize", "label": "SVGO", "wheel": "command", "accepts": ["svg"], "command": "npx -y svgo \"$INPUT\" -o \"$DIR/$NAME.min.svg\"" },
+
+  { "id": "vid-mp4", "label": "MP4", "wheel": "shift", "accepts": ["mov","mkv","avi","webm"], "command": "ffmpeg -y -i \"$INPUT\" -c:v libx264 -crf 20 -c:a aac -movflags +faststart \"$DIR/$NAME.mp4\"" },
+  { "id": "vid-webm", "label": "WebM", "wheel": "shift", "accepts": ["mp4","mov"], "command": "ffmpeg -y -i \"$INPUT\" -c:v libvpx-vp9 -crf 32 -b:v 0 -c:a libopus \"$DIR/$NAME.webm\"" },
+  { "id": "vid-gif", "label": "GIF", "wheel": "shift", "accepts": ["mp4","mov","webm"], "command": "ffmpeg -y -i \"$INPUT\" -vf \"fps=12,scale=640:-1:flags=lanczos,split[a][b];[a]palettegen[p];[b][p]paletteuse\" \"$DIR/$NAME.gif\"" },
+  { "id": "to-mp3", "label": "MP3", "wheel": "shift", "accepts": ["mp4","mov","mkv","webm","wav","m4a","flac","aiff","ogg"], "command": "ffmpeg -y -i \"$INPUT\" -vn -c:a libmp3lame -q:a 2 \"$DIR/$NAME.mp3\"" },
+  { "id": "aud-ogg", "label": "OGG (game)", "wheel": "shift", "accepts": ["wav","mp3","flac","aiff"], "command": "ffmpeg -y -i \"$INPUT\" -c:a libvorbis -q:a 5 \"$DIR/$NAME.ogg\"" },
+
+  { "id": "vid-compress", "label": "Nén video", "wheel": "command", "accepts": ["mp4","mov","mkv"], "command": "ffmpeg -y -i \"$INPUT\" -c:v libx264 -crf 26 -preset medium -c:a aac -b:a 128k -movflags +faststart \"$DIR/$NAME-small.mp4\"" },
+  { "id": "vid-shorts", "label": "Shorts 9:16", "wheel": "command", "accepts": ["mp4","mov"], "command": "ffmpeg -y -i \"$INPUT\" -vf \"crop=ih*9/16:ih,scale=1080:1920\" -c:a copy \"$DIR/$NAME-shorts.mp4\"" },
+  { "id": "vid-thumb", "label": "Thumbnail", "wheel": "command", "accepts": ["mp4","mov","mkv","webm"], "command": "ffmpeg -y -ss 1 -i \"$INPUT\" -frames:v 1 \"$DIR/$NAME-thumb.jpg\"" },
+  { "id": "vid-mute", "label": "Bỏ âm thanh", "wheel": "command", "accepts": ["mp4","mov"], "command": "ffmpeg -y -i \"$INPUT\" -an -c:v copy \"$DIR/$NAME-mute.${INPUT##*.}\"" },
+  { "id": "aud-loudnorm", "label": "Chuẩn -14 LUFS", "wheel": "command", "accepts": ["wav","mp3","m4a"], "command": "ffmpeg -y -i \"$INPUT\" -af loudnorm=I=-14:TP=-1:LRA=11 \"$DIR/$NAME-norm.${INPUT##*.}\"" },
+
+  { "id": "md-docx", "label": "DOCX", "wheel": "shift", "accepts": ["md"], "command": "pandoc \"$INPUT\" -o \"$DIR/$NAME.docx\"" },
+  { "id": "md-html", "label": "HTML", "wheel": "shift", "accepts": ["md"], "command": "pandoc -s \"$INPUT\" -o \"$DIR/$NAME.html\"" },
+  { "id": "docx-md", "label": "Markdown", "wheel": "shift", "accepts": ["docx"], "command": "pandoc \"$INPUT\" -t gfm -o \"$DIR/$NAME.md\"" },
+  { "id": "office-pdf", "label": "PDF", "wheel": "shift", "accepts": ["docx","doc","pptx","ppt","xlsx","xls"], "command": "/Applications/LibreOffice.app/Contents/MacOS/soffice --headless --convert-to pdf --outdir \"$DIR\" \"$INPUT\"" },
+  { "id": "pdf-png", "label": "PNG từng trang", "wheel": "shift", "accepts": ["pdf"], "command": "pdftoppm -png -r 150 \"$INPUT\" \"$DIR/$NAME\"" },
+  { "id": "pdf-txt", "label": "TXT", "wheel": "shift", "accepts": ["pdf"], "command": "pdftotext -layout \"$INPUT\" \"$DIR/$NAME.txt\"" },
+  { "id": "csv-json", "label": "JSON", "wheel": "shift", "accepts": ["csv"], "command": "python3 -c 'import csv,json,os;r=list(csv.DictReader(open(os.environ[\"INPUT\"],encoding=\"utf-8\")));json.dump(r,open(os.path.join(os.environ[\"DIR\"],os.environ[\"NAME\"]+\".json\"),\"w\",encoding=\"utf-8\"),ensure_ascii=False,indent=2)'" },
+  { "id": "json-ts", "label": "TS types", "wheel": "shift", "accepts": ["json"], "command": "npx -y quicktype \"$INPUT\" --lang ts --just-types -o \"$DIR/$NAME.types.ts\"" },
+
+  { "id": "pdf-compress", "label": "Nén PDF", "wheel": "command", "accepts": ["pdf"], "command": "gs -sDEVICE=pdfwrite -dPDFSETTINGS=/ebook -dNOPAUSE -dBATCH -dQUIET -sOutputFile=\"$DIR/$NAME-small.pdf\" \"$INPUT\"" },
+
+  { "id": "copy-path", "label": "Copy path", "wheel": "control", "accepts": ["*"], "command": "printf '%s' \"$INPUT\" | pbcopy" },
+  { "id": "copy-content", "label": "Copy nội dung", "wheel": "control", "accepts": ["txt","md","json","ts","tsx","js","jsx","css","html","csv","svg"], "command": "pbcopy < \"$INPUT\"" },
+  { "id": "copy-data-uri", "label": "Copy data URI", "wheel": "control", "accepts": ["png","jpg","jpeg","webp","svg","gif"], "command": "printf 'data:%s;base64,%s' \"$(file -b --mime-type \"$INPUT\")\" \"$(base64 -i \"$INPUT\")\" | pbcopy" },
+  { "id": "copy-sha256", "label": "Copy SHA-256", "wheel": "control", "accepts": ["*"], "command": "shasum -a 256 \"$INPUT\" | cut -d' ' -f1 | pbcopy" },
+  { "id": "zip", "label": "Zip", "wheel": "control", "accepts": ["*"], "command": "ditto -c -k --keepParent \"$INPUT\" \"$DIR/$NAME.zip\"" },
+  { "id": "open-vscode", "label": "Mở VS Code", "wheel": "control", "accepts": ["*"], "command": "open -a 'Visual Studio Code' \"$INPUT\"" },
+  { "id": "claude-here", "label": "Claude Code", "wheel": "control", "accepts": ["*"], "command": "osascript -e 'tell application \"Terminal\" to do script \"cd \" & quoted form of (system attribute \"DIR\") & \" && claude\"'" }
+]
