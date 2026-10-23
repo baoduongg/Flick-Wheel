@@ -28,8 +28,7 @@ final class AnnotateWindowController: NSObject, NSWindowDelegate {
     }
 
     func show() {
-        NSApp.activate(ignoringOtherApps: true)
-        window.makeKeyAndOrderFront(nil)
+        window.showCentered()
     }
 
     private func save() {

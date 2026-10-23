@@ -24,20 +24,34 @@ struct AnnotatedImageView: View {
             Image(decorative: image, scale: 1)
                 .resizable()
                 .frame(width: size.width, height: size.height)
-            Canvas { context, _ in
-                for annotation in annotations {
-                    draw(annotation, in: &context)
-                }
-                if let selection {
-                    let rect = CGRect(x: selection.minX * scale, y: selection.minY * scale,
-                                      width: selection.width * scale, height: selection.height * scale)
-                    context.stroke(Path(rect), with: .color(.white),
-                                   style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
-                }
-            }
-            .frame(width: size.width, height: size.height)
+            AnnotationLayer(pixelSize: CGSize(width: image.width, height: image.height),
+                            annotations: annotations, base: base, scale: scale, selection: selection)
         }
         .frame(width: size.width, height: size.height)
+    }
+}
+
+// just the marks, so other windows can draw them over their own picture
+struct AnnotationLayer: View {
+    let pixelSize: CGSize
+    let annotations: [Annotation]
+    let base: CGFloat
+    let scale: CGFloat
+    var selection: CGRect?
+
+    var body: some View {
+        Canvas { context, _ in
+            for annotation in annotations {
+                draw(annotation, in: &context)
+            }
+            if let selection {
+                let rect = CGRect(x: selection.minX * scale, y: selection.minY * scale,
+                                  width: selection.width * scale, height: selection.height * scale)
+                context.stroke(Path(rect), with: .color(.white),
+                               style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
+            }
+        }
+        .frame(width: pixelSize.width * scale, height: pixelSize.height * scale)
     }
 
     private func draw(_ a: Annotation, in context: inout GraphicsContext) {

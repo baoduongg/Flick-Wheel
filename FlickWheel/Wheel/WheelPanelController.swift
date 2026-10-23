@@ -33,6 +33,7 @@ final class WheelPanelController {
         dropView.configure(actions: actions)
         panel.setFrame(NSRect(x: point.x - size / 2, y: point.y - size / 2, width: size, height: size), display: true)
         panel.orderFrontRegardless()
+        dropView.present()
     }
 
     func hide() {

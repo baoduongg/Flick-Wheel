@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run FlickWheel",
+      "type": "shell",
+      "command": "pkill -x FlickWheel; xcodebuild -scheme FlickWheel -configuration Debug -derivedDataPath build build -quiet && open build/Build/Products/Debug/FlickWheel.app",
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true },
+      "problemMatcher": {
+        "owner": "swift",
+        "fileLocation": "absolute",
+        "pattern": {
+          "regexp": "^(.+):(\\d+):(\\d+): (error|warning): (.*)$",
+          "file": 1, "line": 2, "column": 3, "severity": 4, "message": 5
+        }
+      }
+    }
+  ]
+}

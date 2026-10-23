@@ -1,20 +1,25 @@
 import AppKit
 import ApplicationServices
+import SwiftUI
 import UserNotifications
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
+final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, ObservableObject {
     @Published private(set) var accessibilityTrusted = false
 
-    private let registry = ActionRegistry()
+    let registry = ActionRegistry()
+    private var settingsWindow: NSWindow?
     private let monitor = DragKeyMonitor()
     private let wheel = WheelPanelController()
     private var cropWindows: [CropWindowController] = []
     private var annotateWindows: [AnnotateWindowController] = []
     private var backgroundWindows: [BackgroundWindowController] = []
+    private var pixelPerfectWindows: [PixelPerfectWindowController] = []
+    private var videoWindows: [VideoWindowController] = []
     private let airDrop = AirDropSender()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert]) { _, _ in }
         reloadActions()
 
@@ -55,6 +60,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             case "crop": openCrop(file)
             case "annotate": openAnnotate(file, tool: tool ?? .arrow)
             case "background": openBackground(file)
+            case "pixelperfect": openPixelPerfect(items.filter { $0.name == "path" }.compactMap(\.value).map { URL(fileURLWithPath: $0) })
+            case "video": openVideo(file, mode: VideoMode(rawValue: items.first { $0.name == "mode" }?.value ?? ""))
+            case "settings": openSettings(tab: items.first { $0.name == "tab" }?.value)
+            case "tool": runTool(BuiltinTool(rawValue: items.first { $0.name == "name" }?.value ?? ""),
+                                 items.filter { $0.name == "path" }.compactMap(\.value).map { URL(fileURLWithPath: $0) })
             case "airdrop": if let file { airDrop.send(file) }
             default: break
             }
@@ -97,11 +107,96 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         controller.show()
     }
 
+    private func openPixelPerfect(_ files: [URL]) {
+        guard files.count == 2, let controller = PixelPerfectWindowController(files: files) else {
+            ActionRunner.notify(title: "Pixel Perfect failed", body: "Need two readable images")
+            return
+        }
+        controller.onClose = { [weak self] closed in
+            self?.pixelPerfectWindows.removeAll { $0 === closed }
+        }
+        pixelPerfectWindows.append(controller)
+        controller.show()
+    }
+
+    private func runTool(_ tool: BuiltinTool?, _ files: [URL]) {
+        guard let tool, let file = files.first else {
+            ActionRunner.notify(title: "Tool failed", body: "Unknown tool or missing file")
+            return
+        }
+        let job = JobCenter.shared.begin(title: tool.title, file: file.lastPathComponent)
+        Task {
+            do {
+                let outcome = try await Task.detached { try tool.run(on: files) }.value
+                if let text = outcome.clipboard {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(text, forType: .string)
+                }
+                JobCenter.shared.finish(job, state: .succeeded, output: outcome.output)
+                ActionRunner.notify(title: tool.title, body: outcome.message, file: outcome.output)
+            } catch {
+                JobCenter.shared.finish(job, state: .failed, detail: error.localizedDescription)
+                ActionRunner.notify(title: "\(tool.title) failed", body: error.localizedDescription)
+            }
+        }
+    }
+
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
+                                            withCompletionHandler completionHandler: @escaping () -> Void) {
+        if let path = response.notification.request.content.userInfo["path"] as? String {
+            DispatchQueue.main.async { NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: path)]) }
+        }
+        completionHandler()
+    }
+
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
+                                            withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.banner])
+    }
+
+    func openPacksFolder() {
+        try? FileManager.default.createDirectory(at: ActionRegistry.userPacksURL, withIntermediateDirectories: true)
+        NSWorkspace.shared.open(ActionRegistry.userPacksURL)
+    }
+
+    private func openVideo(_ file: URL?, mode: VideoMode?) {
+        Task {
+            guard let file, let mode, let controller = await VideoWindowController.make(file: file, mode: mode) else {
+                ActionRunner.notify(title: "Video preview failed", body: "Cannot open the video (mp4, mov and m4v only)")
+                return
+            }
+            controller.onClose = { [weak self] closed in
+                self?.videoWindows.removeAll { $0 === closed }
+            }
+            videoWindows.append(controller)
+            controller.show()
+        }
+    }
+
     func reloadActions() {
         let problems = registry.load()
         if !problems.isEmpty {
             ActionRunner.notify(title: "Skipped \(problems.count) invalid action(s)", body: problems.joined(separator: "\n"))
         }
+    }
+
+    func openSettings(tab: String? = nil) {
+        if settingsWindow == nil || tab != nil {
+            settingsWindow?.close()
+            let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(
+                registry: registry, tab: tab,
+                tools: SettingsTools(openActions: { [weak self] in self?.openActions() },
+                                     reload: { [weak self] in self?.reloadActions() },
+                                     openPacksFolder: { [weak self] in self?.openPacksFolder() }))))
+            window.title = "FlickWheel Settings"
+            window.styleMask = [.titled, .closable, .resizable]
+            window.isReleasedWhenClosed = false
+            settingsWindow = window
+            window.showCentered()
+            return
+        }
+        NSApp.activate(ignoringOtherApps: true)
+        settingsWindow?.makeKeyAndOrderFront(nil)
     }
 
     func openActions() {

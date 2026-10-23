@@ -15,6 +15,9 @@ targets:
       - path: FlickWheel
         excludes:
           - Resources/Info.plist
+          - Resources/Packs
+      - path: FlickWheel/Resources/Packs
+        type: folder
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.baoduongg.flickwheel
@@ -43,6 +46,17 @@ targets:
           - Backdrop.swift
           - BackgroundModel.swift
           - BackgroundRatio.swift
+      - path: FlickWheel/PixelPerfect
+        includes:
+          - PixelPerfectModel.swift
+      - path: FlickWheel/Tools
+        includes:
+          - ImageTools.swift
+          - ImageDiff.swift
+      - path: FlickWheel/Video
+        includes:
+          - VideoModel.swift
+          - VideoExporter.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.baoduongg.flickwheel.tests

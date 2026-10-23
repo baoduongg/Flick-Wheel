@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FlickWheel: drag a file, flick a key, drop it on a wheel</title>
+<meta name="description" content="FlickWheel is a macOS menu-bar utility. Drag a file in Finder, tap Shift, Command or Control, and drop it on a radial wheel to convert, edit or share it.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#top" aria-label="FlickWheel home"><span class="dot"></span>FlickWheel</a>
+  <nav aria-label="Sections">
+    <a href="#try">Try it</a>
+    <a href="#wheels">Wheels</a>
+    <a href="#editors">Editors</a>
+    <a href="#custom">Customize</a>
+    <a href="#install">Install</a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">macOS 13+ · Apple silicon · free</p>
+      <h1>Drag. Flick. Done.</h1>
+      <p class="lead">Drag a file in Finder, tap Shift, Command or Control, and drop it on a radial wheel. Convert, annotate, compress or share it without leaving the spot.</p>
+      <div class="cta">
+        <a class="btn primary" href="[REPO_URL]">View on GitHub</a>
+        <a class="btn" href="#install">Build from source</a>
+      </div>
+    </div>
+    <figure class="hero-shot">
+      <div class="keys" role="tablist" aria-label="Wheel">
+        <button role="tab" data-wheel="shift" aria-selected="true">Shift <small>convert</small></button>
+        <button role="tab" data-wheel="command" aria-selected="false">Command <small>tools</small></button>
+        <button role="tab" data-wheel="control" aria-selected="false">Control <small>file</small></button>
+      </div>
+      <img id="heroImg" src="assets/wheel-shift.webp" width="640" height="560" alt="The FlickWheel Shift wheel: JPG, PNG, WebP 80%, HEIC, PDF, GIF, MP3 and M4A segments around a dragged file icon.">
+      <figcaption>The real wheel, captured from the app.</figcaption>
+    </figure>
+  </section>
+
+  <section id="how">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><b>1</b><h3>Drag</h3><p>Start dragging a file in Finder.</p></li>
+      <li><b>2</b><h3>Tap a key</h3><p>Hold Shift, Command or Control (no Option or other modifiers) to pick a wheel. Release the key to hide it.</p></li>
+      <li><b>3</b><h3>Drop</h3><p>Drop on a segment to run it. Drop anywhere else and nothing runs.</p></li>
+    </ol>
+  </section>
+
+  <section id="try">
+    <h2>Try it</h2>
+    <p class="sub">Pick a file, choose a wheel, drag the file chip onto a segment. Only actions that accept the file show up, just like the app. Keyboard: S, C or K switches wheel, Tab to a segment and press Enter.</p>
+    <div class="demo">
+      <div class="demo-bar">
+        <div class="seg" role="group" aria-label="Sample file">
+          <button data-file="photo.png" aria-pressed="true">photo.png</button>
+          <button data-file="clip.mp4" aria-pressed="false">clip.mp4</button>
+          <button data-file="notes.txt" aria-pressed="false">notes.txt</button>
+        </div>
+        <div class="seg" role="group" aria-label="Wheel key">
+          <button data-key="shift" aria-pressed="true">Shift</button>
+          <button data-key="command" aria-pressed="false">Command</button>
+          <button data-key="control" aria-pressed="false">Control</button>
+        </div>
+      </div>
+      <div class="stage">
+        <svg id="wheel" viewBox="0 0 400 400" role="group" aria-label="Interactive wheel demo"></svg>
+        <div id="chip" class="chip" draggable="false" tabindex="0" role="button" aria-label="Sample file. Drag it onto a segment.">photo.png</div>
+        <p id="empty" class="empty" hidden>No actions on this wheel accept this file.</p>
+      </div>
+      <p id="toast" class="toast" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section id="wheels">
+    <h2>Three wheels, 24 actions</h2>
+    <p class="sub">Each key opens its own wheel of up to 8 segments.</p>
+    <div class="cards">
+      <article class="card shift"><h3>Shift <small>Convert</small></h3><p>JPG · PNG · WebP 80% · HEIC · PDF · GIF · MP3 · M4A</p></article>
+      <article class="card command"><h3>Command <small>Tools</small></h3><p>Annotate · Crop · Add BG · Redact · Edit · Compress · 50% · Rotate</p></article>
+      <article class="card control"><h3>Control <small>File</small></h3><p>AirDrop · Reveal · Copy file · Copy image · Copy path · Terminal · Zip · SHA-256</p></article>
+    </div>
+  </section>
+
+  <section id="editors">
+    <h2>Built-in editors</h2>
+    <p class="sub">Native windows open straight from the wheel and save a copy beside the original.</p>
+    <div class="cards">
+      <article class="card"><h3>Annotate</h3>
+        <div class="tools"><span>Arrow</span><span>Highlighter</span><span>Text</span><span>Rectangle</span><span>Ellipse</span><span>Pen</span><span>Numbered marker</span></div>
+        <p>Move marks, zoom with pinch or ⌘= / ⌘−, pan by scrolling. Saves <code>name-annotated.ext</code>. <b>Redact</b> opens the same window with a solid block selected and saves <code>name-redacted.ext</code>.</p></article>
+      <article class="card"><h3>Crop</h3>
+        <div class="tools"><span>Drag handles</span><span>Aspect presets</span><span>W / H fields</span></div>
+        <p>Apply writes <code>name-crop.ext</code>. On mp4, mov and m4v, Crop opens a video window with a frame slider and exports with ffmpeg.</p></article>
+      <article class="card"><h3>Add BG</h3>
+        <div class="tools"><span>Gradient</span><span>Solid</span><span>Image</span><span>Padding</span><span>Corner</span><span>Shadow</span><span>Ratio</span></div>
+        <p>Frame a screenshot on a backdrop. Saves <code>name-bg.ext</code>.</p></article>
+      <article class="card"><h3>Video tools <small>optional</small></h3>
+        <div class="tools"><span>Trim</span><span>Snapshots</span><span>Speed</span><span>Split</span><span>Redact</span><span>Crop</span></div>
+        <p>Preview windows with a filmstrip for mp4, mov and m4v, exported in the background with ffmpeg. Turn on the Video pack in Settings.</p></article>
+    </div>
+  </section>
+
+  <section id="custom">
+    <h2>Make it yours</h2>
+    <p class="sub">Every action is one entry in <code>~/.config/flickwheel/actions.json</code>. The file is created on first launch and never overwritten.</p>
+    <div class="code">
+      <button id="copy" class="btn small" aria-label="Copy snippet">Copy</button>
+<pre id="snippet"><code>[{
+  "id": "copy-path",
+  "label": "Copy path",
+  "wheel": "control",
+  "accepts": ["*"],
+  "command": "printf '%s' \"$INPUT\" | pbcopy"
+}]</code></pre>
+    </div>
+    <ul class="facts">
+      <li><b>Safe by design.</b> Paths reach your command only as <code>INPUT</code>, <code>DIR</code> and <code>NAME</code> environment variables, never pasted into the command string, so odd file names cannot break it.</li>
+      <li><b>Runs in zsh.</b> <code>/bin/zsh -lc</code>, once per file, stopped after 120 seconds.</li>
+      <li><b>Settings.</b> Wheels and packs in a sidebar, one row per action with file-kind chips, search, and a live wheel preview per file type. Settings never edits <code>actions.json</code>.</li>
+      <li><b>Packs.</b> Switch on Everyone, Developer, QC or Video packs in Settings: OCR and QR, send-ready images, image diff, simulator installs, LLM-ready copies, video tools.</li>
+      <li><b>Never overwrites.</b> Built-in actions pick a free name (<code>name 2.gif</code>) instead of replacing your file, and the menu bar lets you cancel a job or reveal the last results.</li>
+    </ul>
+  </section>
+
+  <section id="install">
+    <h2>Install</h2>
+    <p class="sub">There is no download yet. FlickWheel is built from source and is ad-hoc signed, not notarized.</p>
+    <div class="cols">
+      <div>
+        <h3>Requirements</h3>
+        <ul>
+          <li>macOS 13+, Apple silicon</li>
+          <li>Xcode 15+ and <a href="https://github.com/yonaskolb/XcodeGen">XcodeGen</a></li>
+          <li><code>ffmpeg</code> for some actions: <code>brew install ffmpeg</code></li>
+        </ul>
+        <h3>Permissions</h3>
+        <ul>
+          <li><b>Accessibility</b> is required for the global drag and key monitors. The prompt appears on first launch.</li>
+          <li><b>Notifications</b> are optional, to see success and failure.</li>
+          <li>Because of ad-hoc signing, the Accessibility grant resets on every rebuild. Sign with your own certificate to keep it.</li>
+        </ul>
+      </div>
+      <div class="code">
+<pre><code>xcodegen generate
+xcodebuild -scheme FlickWheel -configuration Debug build</code></pre>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>FlickWheel · [LICENSE] · by [AUTHOR]</span>
+  <a href="[REPO_URL]">GitHub</a>
+</footer>
+
+<script src="actions-data.js"></script>
+<script src="wheel.js"></script>
+</body>
+</html>

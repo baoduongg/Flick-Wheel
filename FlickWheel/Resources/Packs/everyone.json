@@ -1,0 +1,80 @@
+{
+  "title": "Everyone",
+  "description": "Everyday tools: read text or QR codes from a picture, shrink for sending, remove location data, unzip.",
+  "actions": [
+    {
+      "id": "img-ocr",
+      "label": "Text",
+      "wheel": "shift",
+      "accepts": [
+        "png",
+        "jpg",
+        "jpeg",
+        "heic",
+        "tiff",
+        "bmp",
+        "webp"
+      ],
+      "description": "Read the text in the image and copy it",
+      "command": "open \"flickwheel://tool?name=ocr&path=$(perl -e 'print join q(), map { /[A-Za-z0-9_.~-]/ ? $_ : sprintf(q(%%%02X), ord) } split //, shift' \"$INPUT\")\""
+    },
+    {
+      "id": "img-send",
+      "label": "Send-ready",
+      "wheel": "shift",
+      "accepts": [
+        "png",
+        "jpg",
+        "jpeg",
+        "heic",
+        "tiff",
+        "bmp",
+        "webp"
+      ],
+      "description": "Shrink to 1600 px and drop EXIF/GPS, ready to send",
+      "command": "open \"flickwheel://tool?name=send&path=$(perl -e 'print join q(), map { /[A-Za-z0-9_.~-]/ ? $_ : sprintf(q(%%%02X), ord) } split //, shift' \"$INPUT\")\""
+    },
+    {
+      "id": "img-strip",
+      "label": "Clean",
+      "wheel": "shift",
+      "accepts": [
+        "png",
+        "jpg",
+        "jpeg",
+        "heic",
+        "tiff",
+        "bmp",
+        "webp"
+      ],
+      "description": "Copy without EXIF, GPS or camera data",
+      "command": "open \"flickwheel://tool?name=strip&path=$(perl -e 'print join q(), map { /[A-Za-z0-9_.~-]/ ? $_ : sprintf(q(%%%02X), ord) } split //, shift' \"$INPUT\")\""
+    },
+    {
+      "id": "unzip",
+      "label": "Unzip",
+      "wheel": "shift",
+      "accepts": [
+        "zip"
+      ],
+      "description": "Extract into a folder next to the zip",
+      "command": "ditto -x -k \"$INPUT\" \"$(fw_out \"$DIR/$NAME\")\""
+    },
+    {
+      "id": "img-qr",
+      "label": "QR",
+      "wheel": "shift",
+      "accepts": [
+        "png",
+        "jpg",
+        "jpeg",
+        "heic",
+        "tiff",
+        "bmp",
+        "webp"
+      ],
+      "description": "Read a QR code or barcode in the image and copy its text",
+      "command": "open \"flickwheel://tool?name=qr&path=$(perl -e 'print join q(), map { /[A-Za-z0-9_.~-]/ ? $_ : sprintf(q(%%%02X), ord) } split //, shift' \"$INPUT\")\""
+    }
+  ]
+}
