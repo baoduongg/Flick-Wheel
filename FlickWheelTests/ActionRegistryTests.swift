@@ -41,6 +41,25 @@ final class ActionRegistryTests: XCTestCase {
         XCTAssertEqual(registry.usableActions(for: .shift, files: png).count, 10)
     }
 
+    func testDraggedOrderIsKeptPerWheelAndCanBeReset() throws {
+        let entries = (1...4).map {
+            #"{"id":"a\#($0)","label":"A","wheel":"shift","accepts":["*"],"command":"x"}"#
+        }.joined(separator: ",") + #",{"id":"c1","label":"C","wheel":"control","accepts":["*"],"command":"x"}"#
+        let registry = try makeRegistry(json: "[\(entries)]")
+        registry.load()
+        let png = [URL(fileURLWithPath: "/tmp/a.png")]
+        registry.moveAction(on: .shift, from: 3, to: 0)       // a4 to the front
+        registry.moveAction(on: .shift, from: 0, to: 3)       // and back in front of a3's slot
+        XCTAssertEqual(registry.usableActions(for: .shift, files: png).map(\.id), ["a1", "a2", "a4", "a3"])
+        XCTAssertEqual(registry.usableActions(for: .control, files: png).map(\.id), ["c1"])
+        registry.load()                                         // survives a reload
+        XCTAssertEqual(registry.usableActions(for: .shift, files: png).map(\.id), ["a1", "a2", "a4", "a3"])
+        XCTAssertTrue(registry.hasCustomOrder(.shift))
+        registry.resetOrder(.shift)
+        XCTAssertEqual(registry.usableActions(for: .shift, files: png).map(\.id), ["a1", "a2", "a3", "a4"])
+        XCTAssertFalse(registry.hasCustomOrder(.shift))
+    }
+
     func testOriginTellsBuiltInCustomAndPackActionsApart() throws {
         let dir = try packDir(["dev.json": #"{"title":"Developer","actions":[{"id":"p1","label":"P","wheel":"shift","accepts":["png"],"command":"x"}]}"#])
         let registry = try makeRegistry(json: """
@@ -83,6 +102,20 @@ final class ActionRegistryTests: XCTestCase {
         XCTAssertEqual(registry.actions(for: .shift, files: [jpg]).map(\.id), ["b", "c"])
         XCTAssertEqual(registry.actions(for: .shift, files: [txt]).map(\.id), ["c"])
         XCTAssertEqual(registry.actions(for: .shift, files: [png, jpg]).map(\.id), ["c"])
+    }
+
+    func testBangExtensionRulesATypeOut() throws {
+        let registry = try makeRegistry(json: """
+        [
+          {"id":"a","label":"A","wheel":"shift","accepts":["*","!png","!JPG"],"command":"x"}
+        ]
+        """)
+        XCTAssertTrue(registry.load().isEmpty)
+        let file = { (name: String) in URL(fileURLWithPath: "/tmp/" + name) }
+        XCTAssertEqual(registry.actions(for: .shift, files: [file("a.txt")]).map(\.id), ["a"])
+        XCTAssertEqual(registry.actions(for: .shift, files: [file("a.PNG")]).map(\.id), [])
+        XCTAssertEqual(registry.actions(for: .shift, files: [file("a.jpg")]).map(\.id), [])
+        XCTAssertEqual(registry.actions(for: .shift, files: [file("a.txt"), file("b.png")]).map(\.id), [], "every file must pass")
     }
 
     func testWheelFiltering() throws {

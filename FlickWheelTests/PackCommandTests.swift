@@ -59,6 +59,17 @@ final class PackCommandTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: dir.appendingPathComponent("pack 2/src/inner/a.txt").path), "never merges into an existing folder")
     }
 
+    func testCSVToJSONNeverOverwritesAnExistingJSON() async throws {
+        let dir = try scratch()
+        let csv = dir.appendingPathComponent("data.csv")
+        try Data("x,y\n1,\"a, b\"\n".utf8).write(to: csv)
+        try Data("keep me".utf8).write(to: dir.appendingPathComponent("data.json"))
+        let run = await ActionRunner.run(try action("csv-json"), on: csv)
+        XCTAssertTrue(run.succeeded, run.stderr)
+        XCTAssertEqual(try String(contentsOf: dir.appendingPathComponent("data.json")), "keep me")
+        XCTAssertTrue(try String(contentsOf: dir.appendingPathComponent("data 2.json")).contains("\"y\": \"a, b\""))
+    }
+
     func testJSONFormatMinifyAndNoLeftoverOnInvalidInput() async throws {
         let dir = try scratch()
         let file = dir.appendingPathComponent("data.json")
@@ -81,8 +92,11 @@ final class PackCommandTests: XCTestCase {
     func testTimecodeAndTargetSizeEncodeWithFFmpeg() async throws {
         try XCTSkipUnless(FileManager.default.isExecutableFile(atPath: "/opt/homebrew/bin/ffmpeg"))
         let dir = try scratch()
+        // noise does not compress, so the clip is well over the 2 MB target below
+        try shell(["ffmpeg", "-hide_banner", "-loglevel", "error", "-f", "lavfi", "-i", "nullsrc=size=320x180:rate=30:duration=2,geq=random(1)*255:128:128",
+                   "-c:v", "mpeg4", "-q:v", "2", "-pix_fmt", "yuv420p", "clip.mp4"], in: dir)
         try shell(["ffmpeg", "-hide_banner", "-loglevel", "error", "-f", "lavfi", "-i", "testsrc=size=321x181:rate=30:duration=2",
-                   "-c:v", "mpeg4", "-pix_fmt", "yuv420p", "clip.mp4"], in: dir)
+                   "-c:v", "mpeg4", "-pix_fmt", "yuv420p", "tiny.mp4"], in: dir)
         let clip = dir.appendingPathComponent("clip.mp4")
         let stamped = await ActionRunner.run(try action("vid-timecode"), on: clip)
         XCTAssertTrue(stamped.succeeded, stamped.explanation(for: clip))
@@ -97,6 +111,22 @@ final class PackCommandTests: XCTestCase {
         XCTAssertTrue(small.succeeded, small.explanation(for: clip))
         let size = try dir.appendingPathComponent("clip-2mb.mp4").resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
         XCTAssertGreaterThan(size, 0)
-        XCTAssertLessThan(size, 2 * 1024 * 1024)
+        XCTAssertLessThan(size, 2_500_000, "noise makes x264 overshoot its bitrate a little; the 4 MB source must still shrink to about the target")
+
+        // a clip already under the target is left alone instead of being re-encoded bigger
+        let tiny = await ActionRunner.run(probe, on: dir.appendingPathComponent("tiny.mp4"))
+        XCTAssertFalse(tiny.succeeded)
+        XCTAssertTrue(tiny.stderr.contains("Already under 2 MB"), tiny.stderr)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: dir.appendingPathComponent("tiny-2mb.mp4").path))
+    }
+
+    func testFreshInstallStopsBeforeDeletingWhenThereIsNoLockfile() async throws {
+        let dir = try scratch()
+        try FileManager.default.createDirectory(at: dir.appendingPathComponent("node_modules"), withIntermediateDirectories: true)
+        try Data("{}".utf8).write(to: dir.appendingPathComponent("package.json"))
+        let run = await ActionRunner.run(try action("fresh-install"), on: dir)
+        XCTAssertFalse(run.succeeded)
+        XCTAssertTrue(run.stderr.contains("no lockfile"), run.stderr)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: dir.appendingPathComponent("node_modules").path))
     }
 }

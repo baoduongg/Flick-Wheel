@@ -2,7 +2,7 @@ import Foundation
 
 // the kinds of file an action works on, for the chips and filters in Settings
 enum FileKind: String, CaseIterable, Identifiable, Sendable {
-    case image, video, audio, document, code, any
+    case image, video, audio, document, code, folder, any
 
     var id: String { rawValue }
 
@@ -13,6 +13,7 @@ enum FileKind: String, CaseIterable, Identifiable, Sendable {
         case .audio: return "Audio"
         case .document: return "Document"
         case .code: return "Code & apps"
+        case .folder: return "Folder"
         case .any: return "Any file"
         }
     }
@@ -34,6 +35,7 @@ enum FileKind: String, CaseIterable, Identifiable, Sendable {
         case .audio: return "music.note"
         case .document: return "doc.text"
         case .code: return "chevron.left.forwardslash.chevron.right"
+        case .folder: return "folder"
         case .any: return "asterisk"
         }
     }
@@ -42,6 +44,7 @@ enum FileKind: String, CaseIterable, Identifiable, Sendable {
         .image: ["png", "jpg", "jpeg", "heic", "tiff", "bmp", "gif", "webp", "svg"],
         .video: ["mp4", "mov", "m4v", "mkv", "webm", "avi", "flv", "wmv"],
         .audio: ["mp3", "wav", "m4a", "flac", "ogg", "aiff"],
+        .folder: ["dir"],
         .code: ["json", "js", "ts", "tsx", "jsx", "html", "css", "xml", "yml", "yaml", "app", "apk", "ipa"],
     ]
 

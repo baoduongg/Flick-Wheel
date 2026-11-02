@@ -23,6 +23,7 @@ struct RadialWheelView: View {
     var body: some View {
         let size = Self.size(count: state.actions.count)
         ZStack {
+            CenterDisc(radius: Self.radii(count: state.actions.count).inner - 6, shown: state.shown)
             ForEach(Array(state.actions.enumerated()), id: \.element.id) { index, action in
                 GlassSegment(action: action, index: index, count: state.actions.count,
                              hovered: state.hovered == index, shown: state.shown)
@@ -34,19 +35,46 @@ struct RadialWheelView: View {
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.white.opacity(0.85))
                     .shadow(color: .black.opacity(0.4), radius: 2)
-                    .frame(width: 112)
+                    .frame(width: 96)
             }
-            if let cursor = state.cursor, let icon = state.icon {
-                DragPuck(icon: icon, count: state.fileCount)
-                    .position(cursor)
-                    .transition(.scale(scale: 0.6).combined(with: .opacity))
-            }
+            // own observed object: cursor moves must not re-evaluate the segments above
+            PuckLayer(puck: state.puck)
         }
         .frame(width: size, height: size)
         // glass reads best over a dark tint whatever the system appearance is
         .environment(\.colorScheme, .dark)
-        .animation(.spring(response: 0.25, dampingFraction: 0.75), value: state.cursor != nil)
         .allowsHitTesting(false)
+    }
+}
+
+// opaque-ish backdrop so the description stays legible over any window behind the wheel
+private struct CenterDisc: View {
+    let radius: CGFloat
+    let shown: Bool
+
+    var body: some View {
+        Circle()
+            .fill(Color.black.opacity(0.62))
+            .overlay(Circle().stroke(Color.white.opacity(0.14), lineWidth: 0.5))
+            .frame(width: radius * 2, height: radius * 2)
+            .scaleEffect(shown ? 1 : 0.6)
+            .opacity(shown ? 1 : 0)
+            .animation(.spring(response: 0.32, dampingFraction: 0.8), value: shown)
+    }
+}
+
+private struct PuckLayer: View {
+    @ObservedObject var puck: PuckState
+
+    var body: some View {
+        Group {
+            if let cursor = puck.cursor, let icon = puck.icon {
+                DragPuck(icon: icon, count: puck.fileCount)
+                    .position(cursor)
+                    .transition(.scale(scale: 0.6).combined(with: .opacity))
+            }
+        }
+        .animation(.spring(response: 0.25, dampingFraction: 0.75), value: puck.cursor != nil)
     }
 }
 
@@ -78,7 +106,11 @@ final class WheelState: ObservableObject {
     @Published var actions: [WheelAction] = []
     @Published var hovered: Int?
     @Published var shown = false
-    // drag puck: cursor in this view's top-left coordinates
+    let puck = PuckState()
+}
+
+// drag puck: cursor in the wheel view's top-left coordinates
+final class PuckState: ObservableObject {
     @Published var cursor: CGPoint?
     @Published var icon: NSImage?
     @Published var fileCount = 0
@@ -115,16 +147,16 @@ private struct GlassSegment: View {
             label
         }
         .frame(width: size, height: size)
-        .shadow(color: .black.opacity(hovered ? 0.28 : 0.16), radius: hovered ? 12 : 8, y: hovered ? 5 : 3)
+        .shadow(color: .black.opacity(0.2), radius: 8, y: 3)
         // pop out of the ring from the segment centre
-        .scaleEffect(hovered ? 1.1 : 1, anchor: UnitPoint(x: 0.5 + midRadius * CGFloat(sin(theta)) / size,
+        .scaleEffect(hovered ? 1.08 : 1, anchor: UnitPoint(x: 0.5 + midRadius * CGFloat(sin(theta)) / size,
                                                           y: 0.5 - midRadius * CGFloat(cos(theta)) / size))
         .offset(x: hovered ? 6 * CGFloat(sin(theta)) : 0, y: hovered ? -6 * CGFloat(cos(theta)) : 0)
-        .animation(.spring(response: 0.28, dampingFraction: 0.6), value: hovered)
+        .animation(.spring(response: 0.2, dampingFraction: 0.85), value: hovered)
         // staggered entrance from the wheel centre
         .scaleEffect(shown ? 1 : 0.6)
         .opacity(shown ? 1 : 0)
-        .animation(.spring(response: 0.4, dampingFraction: 0.72).delay(Double(index) * 0.025), value: shown)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8).delay(Double(index) * 0.012), value: shown)
     }
 
     private var label: some View {
@@ -139,7 +171,7 @@ private struct GlassSegment: View {
                 .minimumScaleFactor(0.85)
         }
         .foregroundStyle(.white)
-        .shadow(color: .black.opacity(hovered ? 0 : 0.25), radius: 1, y: 0.5)
+        .shadow(color: .black.opacity(0.25), radius: 1, y: 0.5)
         .frame(width: 76)
         .offset(x: midRadius * CGFloat(sin(theta)), y: -midRadius * CGFloat(cos(theta)))
     }

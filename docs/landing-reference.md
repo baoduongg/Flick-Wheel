@@ -1,6 +1,6 @@
 # FlickWheel: tài liệu tham khảo cho landing page
 
-Nguồn: README.md, CLAUDE.md, project.yml, Resources/Info.plist, `ActionRegistry.defaultManifest`, SettingsView, AppDelegate (working tree, ngày 2026-10-23).
+Nguồn: README.md, CLAUDE.md, project.yml, Resources/Info.plist, `ActionRegistry.defaultManifest`, SettingsView, AppDelegate, Resources/Packs/*.json (working tree, ngày 2026-11-02).
 Mọi con số và tên action bên dưới lấy từ code. Đừng thêm tính năng không có ở đây.
 
 ---
@@ -55,11 +55,11 @@ Mỗi bánh xe tối đa 8 ô cho một file (`maxPerWheel = 8`, vì 8 ô cho v�
 | Annotate | ảnh | Mở cửa sổ chú thích (`flickwheel://annotate`) |
 | Crop | ảnh + video | Ảnh: cửa sổ crop. Video mp4/mov/m4v: cửa sổ crop video (`flickwheel://video?mode=crop`). mkv/webm: hộp thoại nhập `WxH` rồi ffmpeg |
 | Add BG | ảnh | Mở cửa sổ thêm nền (`flickwheel://background`) |
+| Pixel Perfect | hai ảnh (thả cùng lúc) | Mở cửa sổ so sánh hai ảnh (`flickwheel://pixelperfect`). Chỉ hiện khi thả đúng hai ảnh |
 | Redact | ảnh | Mở Annotate sẵn công cụ khối đặc |
 | Edit | ảnh, gif, webp, pdf, mp4, mov, m4v | Mở Preview (ảnh/PDF) hoặc QuickTime Player (video) |
 | Compress | jpg, jpeg, mp4, mov, m4v | Ảnh: JPEG chất lượng 60 → `name-small`. Video: avconvert PresetMediumQuality |
 | 50% | ảnh | Giảm một nửa chiều rộng → `name-50` |
-| Rotate | ảnh | Xoay 90° → `name-rotated` |
 
 Ảnh = png, jpg, jpeg, heic, tiff, bmp.
 
@@ -92,6 +92,13 @@ Công cụ ngoài macOS: chỉ `ffmpeg` (`brew install ffmpeg`). `sips`, `pbcopy
 - Video mp4/mov/m4v: cùng cửa sổ crop trên một frame tĩnh, có thanh trượt "Frame" để chọn frame hiển thị. Ghi `name-crop.mp4` (H.264 + AAC, kích thước chẵn).
 - Video mkv/webm: hộp thoại `WxH`, ghi `name-crop.mp4`.
 
+### Pixel Perfect (so sánh hai ảnh)
+- Thả hai ảnh cùng lúc (ảnh đầu là base). Overlay co về chiều rộng base, nên ảnh chụp 3x khớp thiết kế 1x. Ba chế độ: **Overlay** (opacity), **Difference** (pixel đen = khớp), **Swipe**.
+- Căn bằng kéo hoặc phím mũi tên (⇧ = 10 px); **Swap**, **Annotate** trên base. **Save Comparison** ghi `name-compare.ext` cạnh base.
+
+### Translate (dịch txt/md, nằm trong Everyone pack)
+- Dịch bằng Google Gemini; cần API key dán ở **Settings → Translate** (lưu trong Keychain, chỉ gửi tới API của Google). Kết quả `name.<mã ngôn ngữ>.ext` cạnh file gốc, không ghi đè file có sẵn.
+
 ### Video tools (tùy chọn, không nằm trong default)
 Mỗi bánh xe tối đa 8 ô nên các action này nằm trong **Video pack** (bật ở Settings → Packs, xem mục Packs bên dưới). Cửa sổ mở bằng `flickwheel://video?mode=trim|frame|crop|speed|split|redact&path=`, chỉ nhận mp4, mov, m4v (AVPlayer không phát được mkv/webm/avi). Bấm nút xong cửa sổ đóng, ffmpeg chạy nền, có notification lúc bắt đầu và lúc xong.
 
@@ -113,8 +120,8 @@ Pack là một file JSON chứa thêm action; không đụng tới `actions.json
 
 | Pack | Có gì |
 |---|---|
-| Everyone | **Text** (đọc chữ trong ảnh, chép vào clipboard, Apple Vision), **QR** (đọc mã QR/barcode, chép nội dung), **Send-ready** (thu về 1600px, JPEG, bỏ EXIF/GPS), **Clean** (giữ định dạng, bỏ EXIF/GPS/thông tin máy), **Unzip** (giải nén vào thư mục mới, không gộp vào thư mục có sẵn) |
-| Developer | **iOS Sim**, **Android**, **For LLM** (chép file hoặc cây thư mục dạng khối code kèm đường dẫn), **Format**/**Minify** JSON, **Permalink** (link GitHub tới file ở commit hiện tại, cần push trước), **Diff files** (VS Code hoặc FileMerge), **Verify** (so file với SHA-256 trong clipboard), SVG→TSX, JSON→TS types, CSV→JSON, App icon |
+| Everyone | **Translate** (dịch txt/md bằng Gemini, xem trên), **Text** (đọc chữ trong ảnh, chép vào clipboard, Apple Vision), **QR** (đọc mã QR/barcode, chép nội dung), **Send-ready** (thu về 1600px, JPEG, bỏ EXIF/GPS), **Clean** (giữ định dạng, bỏ EXIF/GPS/thông tin máy), **Unzip** (giải nén vào thư mục mới, không gộp vào thư mục có sẵn) |
+| Developer | **iOS Sim**, **Android**, **For LLM** (chép file hoặc cây thư mục dạng khối code kèm đường dẫn), **Format**/**Minify** JSON, **Permalink** (link GitHub tới file ở commit hiện tại, cần push trước), **Diff files** (VS Code hoặc FileMerge; ảnh dùng Image diff), **Verify** (so file với SHA-256 trong clipboard), SVG→TSX, JSON→TS types, CSV→JSON, App icon. Thả **thư mục**: Clone, Clean, Fresh install, Pull, Repo, Zip src, Sizes, Lines (đếm dòng code theo ngôn ngữ, tôn trọng `.gitignore`) |
 | QC | **Image diff** (hai ảnh: pixel khác tô đỏ, lưu `name-diff.png`, kèm % khác và cảnh báo khi kích thước lệch), **To MB** (nén bản ghi màn hình để vừa giới hạn dung lượng, hỏi số MB; kết quả không vượt quá), **Timecode** (ghi timecode chạy lên video), **Report** (chép tên, dung lượng, loại, kích thước hoặc thời lượng, SHA-256), **Errors** (200 dòng cuối chứa error/fatal/exception/fail/panic) |
 | Video | Các action video ở mục trên |
 
@@ -143,7 +150,7 @@ Text/Send-ready/Clean chạy trong app qua `flickwheel://tool?name=ocr|send|stri
 | `id` | chuỗi duy nhất |
 | `label` | chữ trên ô |
 | `wheel` | `shift`, `command` hoặc `control` |
-| `accepts` | đuôi file viết thường, hoặc `"*"` (không phân biệt hoa thường) |
+| `accepts` | đuôi file viết thường, hoặc `"*"` (không phân biệt hoa thường); `"!ext"` loại một đuôi (`["*", "!png"]`); `"dir"` = thư mục thường, không phải gói `.app` |
 | `command` | chạy bằng `/bin/zsh -lc` |
 | `icon` | tùy chọn, tên SF Symbol |
 | `timeout` | tùy chọn, số giây trước khi bị kill (mặc định 120). Action video đặt 1800 đến 7200 |
@@ -155,12 +162,12 @@ Text/Send-ready/Clean chạy trong app qua `flickwheel://tool?name=ocr|send|stri
 Entry không hợp lệ bị bỏ qua và báo trong một notification.
 
 **Settings** (menu bar → Settings…, ⌘,): cửa sổ resize được, 3 vùng.
-- Sidebar: ba bánh xe, mỗi cái một màu cố định (Shift xanh dương ⇧, Command tím ⌘, Control cam ⌃), thêm mục **Packs**. Màu này dùng lại cho icon, chip pack và preview.
-- Danh sách action (đúng thứ tự trên bánh xe): mỗi dòng có icon, mô tả một dòng, nhãn nguồn (**Built in** / **Custom** / tên pack), chip loại file nhận (Image, Video, Audio, Docs, Code, Any) và công tắc bật/tắt. Có ô tìm kiếm và lọc theo loại file.
+- Sidebar: ba bánh xe, mỗi cái một màu cố định (Shift xanh dương ⇧, Command tím ⌘, Control cam ⌃), thêm mục **Packs** và **Translate** (API key + model Gemini). Màu này dùng lại cho icon, chip pack và preview.
+- Danh sách action (đúng thứ tự trên bánh xe, kéo để đổi thứ tự, lưu ở `actionOrder`): mỗi dòng có icon, mô tả một dòng, nhãn nguồn (**Built in** / **Custom** / tên pack), chip loại file nhận (Image, Video, Audio, Docs, Code, Any) và công tắc bật/tắt. Có ô tìm kiếm và lọc theo loại file.
 - Sidebar đếm **bật / tổng** cho mỗi bánh xe. Khung **Wheel preview** bên phải: chọn file mẫu (png, mp4, mp3, pdf, txt, json) để xem đúng bánh xe thật thu nhỏ, hiện "N of 8 slots used" và đối chiếu số liệu (`7 on = 4 on the wheel + 3 for other file types`), kèm cảnh báo liệt kê các action bị cắt do giới hạn 8 ô. Chip loại file chỉ hiện khi loại đó chiếm ít nhất 1/4 số đuôi file action nhận (một đuôi `gif` lẻ không biến bộ chuyển video thành action ảnh).
 - Cửa sổ Settings có chiều rộng cố định và mở giữa vùng hiển thị của màn hình.
 - Không còn khóa "đủ 8 thì không bật thêm được": luôn bật được, bánh xe chỉ hiện 8 action đầu phù hợp với file.
-- Chỉ bật/tắt hiển thị (và bật/tắt pack), **không sửa actions.json**. Trạng thái lưu trong UserDefaults (`hiddenActionIDs`, `enabledPackIDs`).
+- Chỉ bật/tắt hiển thị, bật/tắt pack và đổi thứ tự, **không sửa actions.json**. Trạng thái lưu trong UserDefaults (`hiddenActionIDs`, `enabledPackIDs`, `actionOrder`). Trang Packs kết thúc bằng số "Adds to your wheels" cho mỗi bánh xe.
 
 **Menu bar**: Settings… (⌘,) · Reload actions · Open actions.json · Accessibility status (granted / not granted) · Quit (⌘Q).
 
@@ -191,8 +198,7 @@ xcodebuild test -scheme FlickWheel
 - Phát hiện kéo: `NSEvent.addGlobalMonitorForEvents` cho `.leftMouseDragged`, `.leftMouseUp`, `.flagsChanged`. File lấy từ `NSPasteboard(name: .drag)`.
 - Bánh xe: `NSPanel` không kích hoạt chứa view SwiftUI, đăng ký nhận file-URL drag, hit-test điểm thả để chọn ô.
 - Chạy lệnh: `/bin/zsh -lc`, timeout mặc định 120 giây (`timeout` trong manifest ghi đè được).
-- Có unit test cho phần Actions, Crop, Annotate, Background, PixelPerfect, Video (không chạm UI; test Video chạy ffmpeg thật nếu có).
-- Quy mô: khoảng 2.300 dòng Swift.
+- Có unit test cho phần Actions, Crop, Annotate, Background, PixelPerfect, Tools, Dev (Clone), Video (không chạm UI; test Video chạy ffmpeg thật nếu có).
 
 ## 9. Thông điệp có thể dùng (copy bank, tiếng Anh)
 
@@ -209,38 +215,41 @@ Value prop:
 - Thấy đúng action hợp với loại file đang kéo.
 - Tự viết action bằng một dòng shell, không bị ghi đè khi cập nhật.
 - Đường dẫn chỉ qua biến môi trường, an toàn với tên file lạ.
-- Không package bên thứ ba, không telemetry (app không có code mạng nào ngoài các lệnh bạn tự định nghĩa).
+- Không package bên thứ ba, không telemetry. Chỗ duy nhất app tự gọi mạng là Translate (Gemini), chỉ khi bạn dùng và đã dán key; ngoài ra chỉ các lệnh bạn tự định nghĩa (và `npx`, `git clone`) chạm mạng.
 
 ## 10. Không được nói trên landing page
 
 - Đã notarize / có trên Mac App Store / có file .dmg: **sai**.
 - Hỗ trợ Intel: **sai** (`ARCHS: arm64`).
-- AI action, đổi phím tắt, xử lý hàng loạt: **không có** (ngoài phạm vi phase 1).
+- Đổi phím tắt, xử lý hàng loạt: **không có** (ngoài phạm vi phase 1). AI action duy nhất là Translate (Gemini, txt/md); đừng gợi ý AI cho thứ khác.
 - Settings sửa được action: **sai**, chỉ bật/tắt hiển thị.
 - Có bản tải sẵn: **chưa**. Chỉ build từ source.
 
 ## 11. Lưu ý trước khi dùng nguồn này
 
-1. README đã được cập nhật khớp code (bảng action mặc định, Settings, `timeout`, mục Video tools). Tài liệu này vẫn theo code.
-2. Settings, ActionIcon, giới hạn 8 ô, `Video/`, các action mới đang là **thay đổi chưa commit** (git status: M/??). Commit trước khi công bố.
+1. Khi README, CLAUDE.md và tài liệu này xung đột với code, code thắng.
+2. Settings, ActionIcon, giới hạn 8 ô, `Video/`, `Dev/`, `Translate/`, `PixelPerfect/`, các pack và action mới đang là **thay đổi chưa commit** (git status: M/??). Commit trước khi công bố.
 3. `sample-action.json` ở gốc repo là bộ ví dụ khác (WebP/AVIF, React TSX, srcset…), dùng để tham khảo "Make it yours", không phải mặc định.
 4. Đã có ảnh wheel thật (xem mục 12). Chưa có ảnh các cửa sổ editor (Annotate, Crop, Add BG, các cửa sổ Video), nên landing chỉ liệt kê tính năng bằng chữ.
-5. `~/.config/flickwheel/actions.json` trên máy bạn khác default (có thêm nhiều action như `claude-here`, `open-vscode`, `copy-md`, `csv-json` và các action của Video pack). Landing và tài liệu này chỉ theo **default trong code**, không theo file cá nhân.
+5. `~/.config/flickwheel/actions.json` trên máy bạn khác default (có thêm nhiều action riêng và bản sao các action của pack). Landing và tài liệu này chỉ theo **default trong code**, không theo file cá nhân.
 
 ## 12. Landing page đã tạo (`/landing/`)
 
-Cập nhật: 2026-10-23. HTML + CSS + JS thuần, không build, mở thẳng `landing/index.html` hoặc deploy GitHub Pages. Tổng khoảng 70 KB.
+HTML + CSS + JS thuần, không build, mở thẳng `landing/index.html` hoặc deploy GitHub Pages. Tổng khoảng 70 KB.
 
 | File | Vai trò |
 |---|---|
-| `index.html` | Hero, How it works, Try it (demo), 3 wheels, Editors (gồm thẻ Video tools), Customize, Install |
+| `index.html` | Hero, How it works, Packs (bản sao tương tác của cửa sổ Settings), 3 wheels, Editors (gồm thẻ Video tools), Customize, Install |
 | `style.css` | Dark-first, tự đổi sang light theo hệ thống, `prefers-reduced-motion` |
 | `wheel.js` | Tab wheel ở hero, demo kéo-thả, nút Copy |
-| `actions-data.js` | **Sinh tự động** từ `ActionRegistry.defaultManifest` (24 action, `accepts`, đuôi file đầu ra). Đổi default thì sinh lại, đừng sửa tay |
+| `actions-data.js` | **Sinh tự động** từ `ActionRegistry.defaultManifest` (`accepts`, đuôi file đầu ra). Đổi default thì sinh lại, đừng sửa tay |
+| `packs-data.js` | **Sinh tự động** từ `Resources/Packs/*.json` cho bản sao cửa sổ Settings |
+| `gen-data.py` | Sinh lại `actions-data.js`, `packs-data.js` và `assets/sf/*.png` (icon SF Symbol, cần `swift`): `python3 landing/gen-data.py`. Đổi action, pack hoặc `ActionIcon` thì chạy lại |
+| `assets/icons`, `assets/sf` | Icon file và SF Symbol dựng sẵn cho demo |
 | `assets/wheel-{shift,command,control}.webp` | Ảnh wheel thật, 640x560, khoảng 12 KB mỗi ảnh |
 
 Hành vi demo (đã test bằng Chrome headless):
-- Chọn file `photo.png` / `clip.mp4` / `notes.txt`: chỉ hiện action có `accepts` khớp, giống app (png: Shift 4 ô, Command 7, Control 8. mp4: 3 / 3 / 7. txt: 0 / 0 / 7).
+- Chọn file `photo.png` / `clip.mp4` / `notes.txt`: chỉ hiện action có `accepts` khớp, giống app.
 - Kéo chip file vào ô, hoặc Tab tới ô rồi Enter: hiện kết quả, ví dụ `WebP 80%: photo.png → photo.webp`. Action mở cửa sổ (Crop, Annotate...) chỉ hiện tên file.
 - Phím S / C / K đổi sang Shift / Command / Control.
 - Kiểm tra layout: 1440px và 375px, không overflow ngang.

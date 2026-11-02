@@ -23,6 +23,11 @@ enum ActionIcon {
         "img-strip": ["location.slash", "eye.slash"], "ios-install": ["iphone.gen3", "iphone"], "android-install": ["arrow.down.app", "shippingbox"], "vid-split": ["square.split.2x1", "scissors"], "vid-redact": ["square.dashed.inset.filled", "eye.slash"], "vid-mute": ["speaker.slash"], "vid-speed": ["speedometer", "gauge"],
         "vid-720p": ["aspectratio", "tv"],
         "resize": ["arrow.up.left.and.arrow.down.right"], "rotate": ["rotate.right"],
+        // developer folders
+        "git-clone": ["arrow.down.circle", "square.and.arrow.down"], "clean-deps": ["trash", "sparkles"],
+        "git-pull": ["arrow.triangle.pull", "arrow.down.to.line"], "repo-page": ["globe", "safari"],
+        "zip-src": ["doc.zipper", "archivebox"], "fresh-install": ["arrow.triangle.2.circlepath", "shippingbox"],
+        "code-lines": ["text.alignleft", "number"], "translate": ["character.bubble", "globe"], "disk-usage": ["chart.pie", "internaldrive"],
         // share, open, copy
         "airdrop": ["dot.radiowaves.left.and.right"], "reveal": ["folder"], "zip": ["doc.zipper", "archivebox"],
         "open-terminal": ["terminal"], "open-vscode": ["chevron.left.forwardslash.chevron.right"],

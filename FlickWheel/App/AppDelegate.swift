@@ -16,6 +16,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private var backgroundWindows: [BackgroundWindowController] = []
     private var pixelPerfectWindows: [PixelPerfectWindowController] = []
     private var videoWindows: [VideoWindowController] = []
+    private var cloneWindows: [CloneWindowController] = []
+    private var linesWindows: [LinesWindowController] = []
+    private var translateWindows: [TranslateWindowController] = []
     private let airDrop = AirDropSender()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -42,6 +45,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         monitor.onRelease = { [weak self] in
             self?.wheel.hide()
         }
+        monitor.onCancel = { [weak self] in
+            self?.wheel.hide()
+        }
         monitor.onDragEnd = { [weak self] in
             guard let self, !wheel.contains(NSEvent.mouseLocation) else { return }
             wheel.hide()
@@ -61,6 +67,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             case "annotate": openAnnotate(file, tool: tool ?? .arrow)
             case "background": openBackground(file)
             case "pixelperfect": openPixelPerfect(items.filter { $0.name == "path" }.compactMap(\.value).map { URL(fileURLWithPath: $0) })
+            case "clone": openClone(file)
+            case "lines": openLines(file)
+            case "translate": openTranslate(file)
             case "video": openVideo(file, mode: VideoMode(rawValue: items.first { $0.name == "mode" }?.value ?? ""))
             case "settings": openSettings(tab: items.first { $0.name == "tab" }?.value)
             case "tool": runTool(BuiltinTool(rawValue: items.first { $0.name == "name" }?.value ?? ""),
@@ -104,6 +113,47 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             self?.backgroundWindows.removeAll { $0 === closed }
         }
         backgroundWindows.append(controller)
+        controller.show()
+    }
+
+    private func openClone(_ file: URL?) {
+        guard let file else {
+            ActionRunner.notify(title: "Clone failed", body: "Missing destination folder")
+            return
+        }
+        let folder = WheelAction.isFolder(file) ? file : file.deletingLastPathComponent()
+        let controller = CloneWindowController(into: folder)
+        controller.onClose = { [weak self] closed in
+            self?.cloneWindows.removeAll { $0 === closed }
+        }
+        cloneWindows.append(controller)
+        controller.show()
+    }
+
+    private func openTranslate(_ file: URL?) {
+        guard let file else {
+            ActionRunner.notify(title: "Translate failed", body: "Missing file")
+            return
+        }
+        let controller = TranslateWindowController(file: file)
+        controller.onOpenSettings = { [weak self] in self?.openSettings(tab: "translate") }
+        controller.onClose = { [weak self] closed in
+            self?.translateWindows.removeAll { $0 === closed }
+        }
+        translateWindows.append(controller)
+        controller.show()
+    }
+
+    private func openLines(_ file: URL?) {
+        guard let file, WheelAction.isFolder(file) else {
+            ActionRunner.notify(title: "Lines failed", body: "Drop a folder")
+            return
+        }
+        let controller = LinesWindowController(folder: file)
+        controller.onClose = { [weak self] closed in
+            self?.linesWindows.removeAll { $0 === closed }
+        }
+        linesWindows.append(controller)
         controller.show()
     }
 

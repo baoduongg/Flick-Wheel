@@ -53,6 +53,14 @@ targets:
         includes:
           - ImageTools.swift
           - ImageDiff.swift
+      - path: FlickWheel/Dev
+        includes:
+          - CloneModel.swift
+          - LinesModel.swift
+      - path: FlickWheel/Translate
+        includes:
+          - TranslateSupport.swift
+          - GeminiClient.swift
       - path: FlickWheel/Video
         includes:
           - VideoModel.swift

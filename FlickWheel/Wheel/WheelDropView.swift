@@ -12,7 +12,8 @@ final class WheelDropView: NSView {
     private var dragImageShrunk = false
     private var hovered: Int? {
         get { state.hovered }
-        set { state.hovered = newValue }
+        // @Published fires on every set; skip no-ops so mouse moves inside a segment cost nothing
+        set { if state.hovered != newValue { state.hovered = newValue } }
     }
 
     init() {
@@ -34,7 +35,7 @@ final class WheelDropView: NSView {
         instant.disablesAnimations = true
         withTransaction(instant) {
             state.shown = false
-            state.cursor = nil
+            state.puck.cursor = nil
             state.hovered = nil
             state.actions = actions
         }
@@ -55,7 +56,7 @@ final class WheelDropView: NSView {
 
     override func draggingExited(_ sender: NSDraggingInfo?) {
         dragImageShrunk = false
-        state.cursor = nil
+        state.puck.cursor = nil
         hovered = nil
     }
 
@@ -72,7 +73,10 @@ final class WheelDropView: NSView {
             onEnd?()
             return false
         }
-        onDrop?(actions[index], urls)
+        let action = actions[index]
+        // hide now: a permission prompt can hold the drag session open, and the wheel would sit on top of it
+        onEnd?()
+        onDrop?(action, urls)
         return true
     }
 
@@ -91,8 +95,8 @@ final class WheelDropView: NSView {
         }
         let urls = sender.draggingPasteboard.readObjects(
             forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
-        state.icon = urls.first.map { NSWorkspace.shared.icon(forFile: $0.path) }
-        state.fileCount = urls.count
+        state.puck.icon = urls.first.map { NSWorkspace.shared.icon(forFile: $0.path) }
+        state.puck.fileCount = urls.count
     }
 
     private func track(_ sender: NSDraggingInfo) -> NSDragOperation {
@@ -101,7 +105,7 @@ final class WheelDropView: NSView {
             replaceDragImage(sender)
         }
         let cursor = convert(sender.draggingLocation, from: nil)
-        state.cursor = CGPoint(x: cursor.x, y: bounds.height - cursor.y)
+        state.puck.cursor = CGPoint(x: cursor.x, y: bounds.height - cursor.y)
         hovered = segmentIndex(for: sender)
         // accept anywhere in the panel so a release off-segment still reaches performDragOperation and hides the wheel
         return actions.isEmpty ? [] : .copy

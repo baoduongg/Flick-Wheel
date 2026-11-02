@@ -50,6 +50,7 @@ struct SettingsTools {
 private enum SettingsPage: Hashable {
     case wheel(WheelKind)
     case packs
+    case translate
 }
 
 struct SettingsView: View {
@@ -57,11 +58,12 @@ struct SettingsView: View {
     let tools: SettingsTools
     @State private var page: SettingsPage
 
-    // tab: "shift", "command", "control" or "packs"
+    // tab: "shift", "command", "control", "packs" or "translate"
     init(registry: ActionRegistry, tab: String? = nil, tools: SettingsTools) {
         self.registry = registry
         self.tools = tools
-        let page: SettingsPage = tab == "packs" ? .packs : .wheel(WheelKind(rawValue: tab ?? "") ?? .shift)
+        let page: SettingsPage = tab == "packs" ? .packs : tab == "translate" ? .translate
+            : .wheel(WheelKind(rawValue: tab ?? "") ?? .shift)
         _page = State(initialValue: page)
     }
 
@@ -74,6 +76,7 @@ struct SettingsView: View {
                 switch page {
                 case .wheel(let kind): WheelPage(registry: registry, wheel: kind).id(kind)
                 case .packs: PacksPage(registry: registry, openPacksFolder: tools.openPacksFolder)
+                case .translate: TranslatePage()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -89,6 +92,7 @@ private struct SettingsSidebar: View {
     @ObservedObject var registry: ActionRegistry
     @Binding var page: SettingsPage
     let tools: SettingsTools
+    @ObservedObject private var translate = TranslateSettings.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -105,6 +109,8 @@ private struct SettingsSidebar: View {
                 .padding(.horizontal, 10).padding(.top, 14)
             SidebarRow(symbol: "shippingbox", tint: .indigo, title: "Packs", subtitle: "Extra actions",
                        trailing: "\(registry.enabledPacks.count)/\(registry.packs.count)", selected: page == .packs) { page = .packs }
+            SidebarRow(symbol: "character.bubble", tint: .teal, title: "Translate", subtitle: "Gemini API key",
+                       trailing: translate.hasKey ? "On" : "Off", selected: page == .translate) { page = .translate }
             Spacer()
             VStack(alignment: .leading, spacing: 6) {
                 Button { tools.openActions() } label: { Label("Open actions.json", systemImage: "doc.badge.gearshape") }
@@ -162,6 +168,7 @@ private struct PreviewSample: Identifiable, Hashable {
         PreviewSample(title: "Image (png)", ext: "png"), PreviewSample(title: "Video (mp4)", ext: "mp4"),
         PreviewSample(title: "Audio (mp3)", ext: "mp3"), PreviewSample(title: "PDF", ext: "pdf"),
         PreviewSample(title: "Text (txt)", ext: "txt"), PreviewSample(title: "JSON", ext: "json"),
+        PreviewSample(title: "Folder", ext: "dir"),
     ]
 }
 
@@ -194,17 +201,22 @@ private struct WheelPage: View {
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    ScrollView {
-                        LazyVStack(spacing: 8) {
-                            ForEach(filtered) { action in
-                                ActionRow(action: action, origin: registry.origin(of: action),
-                                          visible: !registry.hidden.contains(action.id)) {
-                                    registry.setHidden(action.id, !registry.hidden.contains(action.id))
-                                }
+                    List {
+                        ForEach(filtered) { action in
+                            ActionRow(action: action, origin: registry.origin(of: action),
+                                      visible: !registry.hidden.contains(action.id),
+                                      canMove: filtered.count == actions.count) {
+                                registry.setHidden(action.id, !registry.hidden.contains(action.id))
                             }
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
                         }
-                        .padding(.vertical, 2)
+                        // a filtered list has gaps, so moving inside it would land in the wrong place
+                        .onMove(perform: filtered.count == actions.count
+                                ? { registry.moveAction(on: wheel, from: $0.first ?? 0, to: $1) } : nil)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
             }
             .padding(20)
@@ -223,8 +235,11 @@ private struct WheelPage: View {
                 .background(wheel.tint.gradient, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(wheel.title) · \(wheel.purpose)").font(.title2.weight(.semibold))
-                Text("Hold \(wheel.title) while dragging a file. A wheel shows the first \(ActionRegistry.maxPerWheel) actions that fit the file, in the order below.")
+                Text("Hold \(wheel.title) while dragging a file. A wheel shows the first \(ActionRegistry.maxPerWheel) actions that fit the file. Drag a row to change its place.")
                     .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                if registry.hasCustomOrder(wheel) {
+                    Button("Reset order") { registry.resetOrder(wheel) }.buttonStyle(.link).font(.callout)
+                }
             }
         }
     }
@@ -281,12 +296,19 @@ private struct ActionRow: View {
     let action: WheelAction
     let origin: ActionOrigin
     let visible: Bool
+    let canMove: Bool
     let toggle: () -> Void
 
     private var kinds: [FileKind] { FileKind.kinds(for: action.accepts) }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "line.3.horizontal")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.tertiary)
+                .opacity(canMove ? 1 : 0.3)
+                .frame(width: 14, height: 36)
+                .help(canMove ? "Drag to change its place on the wheel" : "Clear search and filter to reorder")
             Image(systemName: ActionIcon.symbol(for: action))
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(.white)
@@ -367,7 +389,10 @@ private struct PreviewPane: View {
     let wheel: WheelKind
     @Binding var sample: PreviewSample
 
-    private var files: [URL] { [URL(fileURLWithPath: "/preview/sample.\(sample.ext)")] }
+    private var files: [URL] {
+        [sample.ext == "dir" ? URL(fileURLWithPath: "/preview/sample", isDirectory: true)
+            : URL(fileURLWithPath: "/preview/sample.\(sample.ext)")]
+    }
     // every action that is on for this wheel splits into: on the wheel, cut by the limit, or not for this file type
     private var on: [WheelAction] { registry.actions.filter { $0.wheel == wheel && !registry.hidden.contains($0.id) } }
     private var usable: [WheelAction] { registry.usableActions(for: wheel, files: files) }
@@ -477,8 +502,31 @@ private struct PacksPage: View {
                     }
                 }
             }
+            Divider()
+            packImpact
         }
         .padding(20)
+    }
+
+    // how many actions the switched-on packs put on each wheel
+    private var packImpact: some View {
+        HStack(spacing: 8) {
+            Text("Adds to your wheels").font(.caption).foregroundStyle(.secondary)
+            ForEach([WheelKind.shift, .command, .control], id: \.self) { kind in
+                let added = registry.actions.filter { action in
+                    if case .pack = registry.origin(of: action) { return action.wheel == kind }
+                    return false
+                }.count
+                HStack(spacing: 4) {
+                    Image(systemName: kind.keySymbol).font(.system(size: 9, weight: .bold))
+                    Text("\(kind.title) +\(added)").font(.caption.monospacedDigit())
+                }
+                .padding(.horizontal, 8).padding(.vertical, 3)
+                .background(kind.tint.opacity(0.16), in: Capsule())
+                .foregroundStyle(kind.tint)
+            }
+            Spacer()
+        }
     }
 }
 
@@ -531,5 +579,86 @@ private struct FlowChips: View {
                 .help(action.description ?? action.label)
             }
         }
+    }
+}
+
+
+// MARK: translate page
+
+private struct TranslatePage: View {
+    @ObservedObject private var settings = TranslateSettings.shared
+    @State private var key = ""
+    @State private var replacing = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Translate").font(.title2.weight(.semibold))
+            Text("The Translate action sends a txt or md file to Google Gemini. Your key is kept in the macOS Keychain and is only sent to generativelanguage.googleapis.com.")
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            GroupBox {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Gemini API key").font(.headline)
+                    if settings.hasKey && !replacing {
+                        HStack(spacing: 8) {
+                            Image(systemName: "checkmark.seal.fill").foregroundStyle(.green)
+                            Text("Saved").foregroundStyle(.secondary)
+                            Text("••••••••••••" + settings.keyHint).font(.system(.body, design: .monospaced))
+                            Spacer()
+                            Button("Replace") { replacing = true }
+                        }
+                    } else {
+                        HStack {
+                            SecureField("Paste your key", text: $key)
+                                .textFieldStyle(.roundedBorder)
+                                .onSubmit(save)
+                            Button("Save", action: save).disabled(key.trimmingCharacters(in: .whitespaces).isEmpty)
+                            if settings.hasKey { Button("Cancel") { key = ""; replacing = false } }
+                        }
+                    }
+                    HStack {
+                        Button("Check key") { settings.check() }.disabled(!settings.hasKey || settings.checking)
+                        Button("Remove key", role: .destructive) { settings.removeKey() }.disabled(!settings.hasKey)
+                        Link("Get a key", destination: URL(string: "https://aistudio.google.com/apikey")!)
+                        Spacer()
+                    }
+                    if !settings.status.isEmpty {
+                        Text(settings.status).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(6)
+            }
+            GroupBox {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Model").font(.headline)
+                    HStack {
+                        TextField(GeminiClient.defaultModel, text: $settings.model).textFieldStyle(.roundedBorder).frame(maxWidth: 320)
+                        if !settings.available.isEmpty {
+                            Menu("Your models") {
+                                ForEach(settings.available, id: \.self) { name in Button(name) { settings.model = name } }
+                            }
+                            .fixedSize()
+                        }
+                    }
+                    Text("Google retires models often. Press Check key to list the ones your key can use; if the saved one is gone, the Translate action switches by itself.")
+                        .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(6)
+            }
+            Label("On Google's free tier, text you send may be used to improve Google products. Use a paid project for private files.",
+                  systemImage: "exclamationmark.triangle")
+                .font(.callout)
+                .foregroundStyle(.orange)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer()
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+
+    private func save() {
+        settings.saveKey(key)
+        key = ""
+        replacing = false
     }
 }

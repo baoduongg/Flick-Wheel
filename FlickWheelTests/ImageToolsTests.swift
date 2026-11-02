@@ -122,12 +122,15 @@ final class ImageToolsTests: XCTestCase {
         XCTAssertEqual(result.changedPixels, 500)
         XCTAssertEqual(result.percent, 5, accuracy: 0.001)
         XCTAssertNil(result.sizeMismatch)
-        XCTAssertEqual(result.output.lastPathComponent, "before-diff.png")
-        XCTAssertEqual(properties(result.output)[kCGImagePropertyPixelWidth] as? Int, 100)
+        let output = try XCTUnwrap(result.output)
+        XCTAssertEqual(output.lastPathComponent, "before-diff.png")
+        XCTAssertEqual(properties(output)[kCGImagePropertyPixelWidth] as? Int, 100)
 
         let same = try ImageDiff.compare(a, a)
         XCTAssertEqual(same.changedPixels, 0)
-        XCTAssertEqual(same.output.lastPathComponent, "before-diff 2.png")
+        XCTAssertNil(same.output, "identical images leave no file behind")
+        XCTAssertEqual(try BuiltinTool.diff.run(on: [a, a]).message, "No pixels differ")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: dir.appendingPathComponent("before-diff 2.png").path))
     }
 
     func testDiffReportsSizeMismatchAndNeedsTwoImages() throws {

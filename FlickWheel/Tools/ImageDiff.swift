@@ -7,7 +7,7 @@ import Vision
 // QC helpers that need pixels: compare two screenshots, read a QR code
 enum ImageDiff {
     struct Result {
-        let output: URL
+        let output: URL?  // nil when nothing differs: an all-faded copy is not worth a file
         let changedPixels: Int
         let totalPixels: Int
         let sizeMismatch: (CGSize, CGSize)?
@@ -18,7 +18,7 @@ enum ImageDiff {
     // a pixel counts as changed when any colour channel differs by more than this (out of 255)
     static let tolerance = 16
 
-    // writes "<first>-diff.png": the first image faded, every changed pixel red. The second image is scaled to the
+    // writes "<first>-diff.png" (unless the images match): the first image faded, every changed pixel red. The second image is scaled to the
     // first one's size when they differ, and the mismatch is reported because it is a finding on its own.
     static func compare(_ a: URL, _ b: URL) throws -> Result {
         let first = try load(a), second = try load(b)
@@ -37,6 +37,9 @@ enum ImageDiff {
                 left[i + 3] = 255
             }
         }
+        let mismatch = first.width == second.width && first.height == second.height
+            ? nil : (CGSize(width: first.width, height: first.height), CGSize(width: second.width, height: second.height))
+        guard changed > 0 else { return Result(output: nil, changedPixels: 0, totalPixels: w * h, sizeMismatch: mismatch) }
         let output = ImageTools.uniqueURL(beside: a, suffix: "-diff", ext: "png")
         guard let image = left.withUnsafeMutableBytes({ buffer -> CGImage? in
             CGContext(data: buffer.baseAddress, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w * 4,
@@ -46,8 +49,6 @@ enum ImageDiff {
         }
         CGImageDestinationAddImage(destination, image, nil)
         guard CGImageDestinationFinalize(destination) else { throw ToolFailure(message: "Cannot write \(output.lastPathComponent)") }
-        let mismatch = first.width == second.width && first.height == second.height
-            ? nil : (CGSize(width: first.width, height: first.height), CGSize(width: second.width, height: second.height))
         return Result(output: output, changedPixels: changed, totalPixels: w * h, sizeMismatch: mismatch)
     }
 

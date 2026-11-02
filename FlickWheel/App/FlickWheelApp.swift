@@ -10,7 +10,7 @@ struct FlickWheelApp: App {
         MenuBarExtra {
             if !jobs.running.isEmpty {
                 ForEach(jobs.running) { job in
-                    Button("Cancel \(job.title): \(job.fileName)") { jobs.cancel(job.id) }
+                    Button("Cancel \(job.title): \(job.fileName)\(job.status.map { " (\($0))" } ?? "")") { jobs.cancel(job.id) }
                         .disabled(!job.cancellable)
                 }
                 Divider()
@@ -40,7 +40,15 @@ struct FlickWheelApp: App {
             Button("Quit") { NSApplication.shared.terminate(nil) }
                 .keyboardShortcut("q")
         } label: {
-            Image(systemName: jobs.running.isEmpty ? "circle.grid.cross" : "arrow.triangle.2.circlepath")
+            // a job that reports progress shows its percentage beside the icon
+            if let progress = jobs.running.compactMap(\.progress).first {
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                    Text("\(Int(progress * 100))%").monospacedDigit()
+                }
+            } else {
+                Image(systemName: jobs.running.isEmpty ? "circle.grid.cross" : "arrow.triangle.2.circlepath")
+            }
         }
     }
 

@@ -10,6 +10,8 @@ struct WheelAction: Codable, Identifiable, Equatable, Sendable {
     let id: String
     let label: String
     let wheel: WheelKind
+    // lowercase extensions or "*"; "!ext" rules a type out, e.g. ["*", "!png"] is everything except PNG;
+    // "dir" is a plain folder (not an .app or other package), so "*" alone still matches folders too
     let accepts: [String]
     let command: String
     // optional SF Symbol name; ActionIcon falls back to a per-id default
@@ -23,6 +25,15 @@ struct WheelAction: Codable, Identifiable, Equatable, Sendable {
 
     func accepts(file: URL) -> Bool {
         let ext = file.pathExtension.lowercased()
-        return accepts.contains { $0 == "*" || $0.lowercased() == ext }
+        let rules = accepts.map { $0.lowercased() }
+        let folder = Self.isFolder(file)
+        return !rules.contains("!" + ext) && !(folder && rules.contains("!dir"))
+            && rules.contains { $0 == "*" || $0 == ext || ($0 == "dir" && folder) }
+    }
+
+    static func isFolder(_ file: URL) -> Bool {
+        if file.hasDirectoryPath { return true }
+        let values = try? file.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey])
+        return values?.isDirectory == true && values?.isPackage != true
     }
 }

@@ -44,6 +44,7 @@ final class ActionRegistry: ObservableObject {
     // 8 segments is where the ring is squarest; more only makes the wheel bigger
     nonisolated static let maxPerWheel = 8
     private static let hiddenKey = "hiddenActionIDs"
+    private static let orderKey = "actionOrder"
     private static let packsKey = "enabledPackIDs"
 
     let url: URL
@@ -55,6 +56,8 @@ final class ActionRegistry: ObservableObject {
     private var baseActions: [WheelAction] = []
     // visibility lives in UserDefaults, never in actions.json (that file is user-owned)
     @Published private(set) var hidden: Set<String>
+    // user's drag order, also in UserDefaults; ids not listed (new actions) keep their manifest order after the listed ones
+    private var order: [String]
     private let defaults: UserDefaults
 
     init(url: URL = ActionRegistry.defaultURL, defaults: UserDefaults = .standard,
@@ -64,6 +67,7 @@ final class ActionRegistry: ObservableObject {
         self.packDirs = packDirs
         hidden = Set(defaults.stringArray(forKey: Self.hiddenKey) ?? [])
         enabledPacks = Set(defaults.stringArray(forKey: Self.packsKey) ?? [])
+        order = defaults.stringArray(forKey: Self.orderKey) ?? []
     }
 
     func setPack(_ id: String, enabled: Bool) {
@@ -78,7 +82,35 @@ final class ActionRegistry: ObservableObject {
         for pack in packs where enabledPacks.contains(pack.id) {
             for action in pack.actions where seen.insert(action.id).inserted { merged.append(action) }
         }
-        actions = merged
+        let rank = Dictionary(order.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first })
+        actions = merged.enumerated()
+            .sorted { (rank[$0.element.id] ?? .max, $0.offset) < (rank[$1.element.id] ?? .max, $1.offset) }
+            .map(\.element)
+    }
+
+    // `to` is the SwiftUI onMove offset: the row goes in front of the item now at that index
+    func moveAction(on wheel: WheelKind, from: Int, to: Int) {
+        var ids = actions.filter { $0.wheel == wheel }.map(\.id)
+        guard ids.indices.contains(from) else { return }
+        let id = ids.remove(at: from)
+        ids.insert(id, at: min(max(to > from ? to - 1 : to, 0), ids.count))
+        saveOrder(actions.filter { $0.wheel != wheel }.map(\.id) + ids)
+    }
+
+    func hasCustomOrder(_ wheel: WheelKind) -> Bool {
+        let ids = Set(actions.filter { $0.wheel == wheel }.map(\.id))
+        return order.contains(where: ids.contains)
+    }
+
+    func resetOrder(_ wheel: WheelKind) {
+        let ids = Set(actions.filter { $0.wheel == wheel }.map(\.id))
+        saveOrder(order.filter { !ids.contains($0) })
+    }
+
+    private func saveOrder(_ ids: [String]) {
+        order = ids
+        defaults.set(ids, forKey: Self.orderKey)
+        rebuild()
     }
 
     func enabledCount(_ wheel: WheelKind) -> Int {
@@ -108,6 +140,7 @@ final class ActionRegistry: ObservableObject {
         // reload also picks up visibility changed outside the app
         hidden = Set(defaults.stringArray(forKey: Self.hiddenKey) ?? [])
         enabledPacks = Set(defaults.stringArray(forKey: Self.packsKey) ?? [])
+        order = defaults.stringArray(forKey: Self.orderKey) ?? []
         var problems: [String] = []
         do {
             if !FileManager.default.fileExists(atPath: url.path) {

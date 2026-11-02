@@ -43,7 +43,8 @@ enum BuiltinTool: String, CaseIterable {
         case .diff:
             guard files.count == 2 else { throw ToolFailure(message: "Drop exactly two images to compare") }
             let result = try ImageDiff.compare(files[0], files[1])
-            var message = String(format: "%.2f%% of pixels differ (%d of %d)", result.percent, result.changedPixels, result.totalPixels)
+            var message = result.output == nil ? "No pixels differ"
+                : String(format: "%.2f%% of pixels differ (%d of %d)", result.percent, result.changedPixels, result.totalPixels)
             if let (a, b) = result.sizeMismatch {
                 message += ". Sizes differ: \(Int(a.width))x\(Int(a.height)) vs \(Int(b.width))x\(Int(b.height))"
             }

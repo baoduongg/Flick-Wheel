@@ -29,18 +29,20 @@ Only actions whose `wheel` matches the key and whose `accepts` covers every drag
 | Key | Actions |
 |---|---|
 | Shift (convert) | JPG, PNG, WebP 80%, HEIC, PDF, GIF, MP3, M4A |
-| Command (tools) | Annotate, Crop, Add BG, Redact, Edit, Compress, 50%, Rotate |
+| Command (tools) | Annotate, Crop, Add BG, Pixel Perfect, Redact, Edit, Compress, 50% |
 | Control (file) | AirDrop, Reveal, Copy file, Copy image, Copy path, Terminal, Zip, SHA-256 |
 
 A wheel shows at most 8 segments for any one file. Click the menu bar item, then **Settings…** (⌘,):
 
-- The sidebar has the three wheels (blue ⇧ Shift, purple ⌘ Command, orange ⌃ Control; the same colours mark every action) and **Packs**.
-- Each action is a row with its icon, a one-line description, a **Built in / Custom / pack-name** badge, chips for the file kinds it accepts (Image, Video, Audio, Docs, Code, Any) and an on/off switch. Rows are in wheel order. Search and the kind chips filter the list.
+- The sidebar has the three wheels (blue ⇧ Shift, purple ⌘ Command, orange ⌃ Control; the same colours mark every action), **Packs** and **Translate** (Gemini API key and model).
+- Each action is a row with its icon, a one-line description, a **Built in / Custom / pack-name** badge, chips for the file kinds it accepts (Image, Video, Audio, Docs, Code, Any) and an on/off switch. Rows are in wheel order and can be dragged to reorder (stored in `actionOrder`). Search and the kind chips filter the list.
 - The sidebar counts **on / total** per wheel. The right pane previews the real wheel for a sample file (png, mp4, mp3, pdf, txt, json) and reconciles the numbers: `7 on = 4 on the wheel + 3 for other file types` (plus any cut by the 8-slot limit, named so you can switch one off to bring the next in). A kind chip appears when it covers at least a quarter of an action's accepted extensions, so a stray `gif` does not make a video converter an image action.
 - The window has a fixed width and opens centred in the usable screen area, like every other FlickWheel window.
-- Settings only toggles visibility and pack on/off (stored in `UserDefaults`); it never edits `actions.json`.
+- Settings only toggles visibility, pack on/off and order (stored in `UserDefaults`); it never edits `actions.json`.
 
 **Crop** on images opens a crop window (drag handles or the box, aspect presets, W/H fields, Apply writes `name-crop.ext` beside the original). The action runs `open "flickwheel://crop?path=<percent-encoded path>"`, which the app handles. On mp4, mov and m4v, Crop opens the video crop window (see [Video tools](#video-tools)); on mkv and webm it asks for a `WxH` size in a dialog.
+
+**Pixel Perfect** takes two images (drop both at once; the first is the base) and opens a comparison window: Overlay (opacity slider), Difference (black pixels match, anything lit differs) or Swipe. Drag the overlay or use the arrow keys (⇧ for 10 px) to align it, Swap exchanges the two, and Annotate lets you mark the base. The overlay is scaled to the base width, so a 3x phone screenshot lines up with a 1x design. **Save Comparison** writes `name-compare.ext` beside the base. It only shows when exactly two images are dropped.
 
 **GIF** makes a 15 fps palette GIF at most 720 px wide, never upscaled. **MP3** accepts audio and video files and keeps metadata.
 
@@ -51,12 +53,14 @@ A pack is a JSON file of extra actions that you switch on in **Settings → Pack
 
 | Pack | Adds |
 |---|---|
-| Everyone | **Text** (read the text in an image and copy it, Apple Vision), **QR** (read a QR code or barcode and copy it), **Send-ready** (shrink to 1600 px, JPEG, drop EXIF and GPS), **Clean** (same format, no EXIF, GPS or camera data), **Unzip** (into a folder that never merges with an existing one) |
-| Developer | **iOS Sim** (install a `.app` on the booted simulator and launch it), **Android** (`adb install -r` an `.apk`), **For LLM** (copy a file, or a folder tree, as a fenced block with its path), **Format** / **Minify** JSON, **Permalink** (GitHub link to the file at the current commit; push first), **Diff files** (two files, VS Code or FileMerge), **Verify** (file against a SHA-256 on the clipboard; fails with both hashes when they differ), SVG to TSX, JSON to TS types, CSV to JSON, App icon |
+| Everyone | **Text** (read the text in an image and copy it, Apple Vision), **QR** (read a QR code or barcode and copy it), **Send-ready** (shrink to 1600 px, JPEG, drop EXIF and GPS), **Clean** (same format, no EXIF, GPS or camera data), **Unzip** (into a folder that never merges with an existing one), **Translate** (txt or md through Google Gemini; see below) |
+| Developer | **iOS Sim** (install a `.app` on the booted simulator and launch it), **Android** (`adb install -r` an `.apk`), **For LLM** (copy a file, or a folder tree, as a fenced block with its path), **Format** / **Minify** JSON, **Permalink** (GitHub link to the file at the current commit; push first), **Diff files** (two non-image files, VS Code or FileMerge; images use Image diff), **Verify** (file against a SHA-256 on the clipboard; fails with both hashes when they differ), SVG to TSX, JSON to TS types, CSV to JSON, App icon. Drop a folder for clone, clean, fresh install, pull, repo page, zip, sizes and lines of code (git `.gitignore` respected) |
 | QC | **Image diff** (two images: changed pixels in red, saved as `name-diff.png`, with the % that differ and a note when the sizes differ), **To MB** (re-encode a recording to fit a size limit, asks for MB; the result is at most that size), **Timecode** (burn a running timecode into a video), **Report** (copy name, size, type, dimensions or duration and SHA-256), **Errors** (the last 200 lines that mention error, fatal, exception, fail or panic) |
 | Video | The video actions below |
 
 Built-in packs live in the app bundle (`Resources/Packs`). Add your own as `~/.config/flickwheel/packs/<name>.json` (**Open packs folder** in Settings); a user pack with the same name replaces the built-in one. A pack file is either an array of actions, or `{ "title", "description", "actions": [...] }`.
+
+**Translate** opens a window (target language, progress per part) for a txt or md file and writes `name.<code>.ext` beside it, never over an existing file. It needs a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey), pasted in **Settings → Translate** and kept in the macOS Keychain; it is sent only to Google's API.
 
 Text, Send-ready and Clean run inside the app through `flickwheel://tool?name=ocr|send|strip|qr|diff&path=<percent-encoded path>` (repeat `path=` for the two images of `diff`). SVG to TSX and JSON to TS use `npx` with pinned versions (`@svgr/cli@8.1.0`, `quicktype@26.0.0`), so the first run needs network.
 
@@ -100,7 +104,7 @@ An existing `actions.json` is never overwritten, so new defaults only appear for
 | `id` | unique string |
 | `label` | segment text |
 | `wheel` | `shift`, `command` or `control` |
-| `accepts` | lowercase extensions, or `"*"` (matching ignores case) |
+| `accepts` | lowercase extensions, or `"*"` (matching ignores case); `"!ext"` rules a type out (`["*", "!png"]`); `"dir"` means a plain folder, not an `.app` package |
 | `command` | run with `/bin/zsh -lc` |
 | `icon` | optional SF Symbol name; otherwise a per-`id` default, or a generic wheel icon |
 | `timeout` | optional seconds before the command is killed (default 120) |

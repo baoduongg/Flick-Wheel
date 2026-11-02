@@ -1,6 +1,6 @@
 {
   "title": "Everyone",
-  "description": "Everyday tools: read text or QR codes from a picture, shrink for sending, remove location data, unzip.",
+  "description": "Everyday tools: read text or QR codes from a picture, shrink for sending, remove location data, unzip, translate text files.",
   "actions": [
     {
       "id": "img-ocr",
@@ -75,6 +75,17 @@
       ],
       "description": "Read a QR code or barcode in the image and copy its text",
       "command": "open \"flickwheel://tool?name=qr&path=$(perl -e 'print join q(), map { /[A-Za-z0-9_.~-]/ ? $_ : sprintf(q(%%%02X), ord) } split //, shift' \"$INPUT\")\""
+    },
+    {
+      "id": "translate",
+      "label": "Translate",
+      "wheel": "shift",
+      "accepts": [
+        "txt",
+        "md"
+      ],
+      "description": "Translate the text with Google Gemini (add your API key in Settings > Translate)",
+      "command": "open \"flickwheel://translate?path=$(perl -e 'print join q(), map { /[A-Za-z0-9_.~-]/ ? $_ : sprintf(q(%%%02X), ord) } split //, shift' \"$INPUT\")\""
     }
   ]
 }
