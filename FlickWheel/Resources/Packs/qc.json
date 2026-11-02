@@ -1,0 +1,77 @@
+{
+  "title": "QC",
+  "description": "For testers: compare screenshots, shrink recordings to a size limit, stamp timecodes, copy bug-report details.",
+  "actions": [
+    {
+      "id": "img-diff",
+      "label": "Image diff",
+      "wheel": "command",
+      "accepts": [
+        "png",
+        "jpg",
+        "jpeg",
+        "heic",
+        "tiff",
+        "bmp",
+        "webp"
+      ],
+      "multi": true,
+      "description": "Compare two images: changed pixels in red, plus the % that differ",
+      "command": "open \"flickwheel://tool?name=diff&$(printf '%s\\n' \"$INPUTS\" | perl -ne 'chomp; $p = join q(), map { /[A-Za-z0-9_.~-]/ ? $_ : sprintf(q(%%%02X), ord) } split //; print q(path=), $p, q(&)')\""
+    },
+    {
+      "id": "vid-target",
+      "label": "To MB",
+      "wheel": "shift",
+      "accepts": [
+        "mp4",
+        "mov",
+        "m4v",
+        "mkv",
+        "webm",
+        "avi"
+      ],
+      "timeout": 7200,
+      "description": "Re-encode to fit a size limit (asks for MB), e.g. 10 MB for Jira or Slack",
+      "command": "r=$(osascript -e 'text returned of (display dialog \"Target size in MB\" default answer \"10\" buttons {\"Cancel\",\"Go\"} default button \"Go\" with title \"FlickWheel\")') || { echo Cancelled >&2; exit 1; }; r=${r// /}; [[ $r =~ ^[0-9]+([.][0-9]+)?$ ]] && (( r >= 1 )) || { echo 'Use a number of MB, 1 or more' >&2; exit 1; }; (( $(stat -f%z \"$INPUT\") > r * 1048576 )) || { echo \"Already under $r MB, nothing to shrink\" >&2; exit 1; }; dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 \"$INPUT\"); kbps=$(awk -v mb=$r -v d=$dur 'BEGIN{ k=int(mb*8192*0.93/d) - 128; print (k<100?100:k) }'); ffmpeg -hide_banner -loglevel error -y -i \"$INPUT\" -vf \"scale='trunc(iw/2)*2':'trunc(ih/2)*2'\" -c:v libx264 -b:v ${kbps}k -maxrate ${kbps}k -bufsize $((kbps*2))k -preset medium -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart \"$(fw_out \"$DIR/$NAME-${r}mb.mp4\")\""
+    },
+    {
+      "id": "vid-timecode",
+      "label": "Timecode",
+      "wheel": "shift",
+      "accepts": [
+        "mp4",
+        "mov",
+        "m4v",
+        "mkv",
+        "webm",
+        "avi"
+      ],
+      "timeout": 7200,
+      "description": "Burn a running timecode into the video so a bug can be pinpointed",
+      "command": "ffmpeg -hide_banner -loglevel error -y -i \"$INPUT\" -vf \"drawtext=text='%{pts\\:hms}':x=16:y=h-th-16:fontsize=h/22:fontcolor=white:box=1:boxcolor=black@0.6:boxborderw=8,scale='trunc(iw/2)*2':'trunc(ih/2)*2'\" -c:v libx264 -crf 20 -pix_fmt yuv420p -c:a aac -b:a 160k -movflags +faststart \"$(fw_out \"$DIR/$NAME-timecode.mp4\")\""
+    },
+    {
+      "id": "file-report",
+      "label": "Report",
+      "wheel": "control",
+      "accepts": [
+        "*"
+      ],
+      "description": "Copy name, size, type, dimensions or duration and SHA-256 for a bug report",
+      "command": "f=\"$INPUT\"; { echo \"File: ${f:t}\"; echo \"Size: $(stat -f%z \"$f\") bytes ($(du -sh \"$f\" | cut -f1))\"; echo \"Type: $(file -b --mime-type \"$f\")\"; case \"${f:e:l}\" in png|jpg|jpeg|heic|tiff|bmp|gif|webp) sips -g pixelWidth -g pixelHeight \"$f\" | awk '/pixelWidth/{w=$2} /pixelHeight/{h=$2} END{print \"Dimensions: \" w \"x\" h}';; mp4|mov|m4v|mkv|webm|avi|mp3|wav|m4a|flac|ogg) ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate -of default=nw=1 \"$f\" | sed 's/^/  /';; esac; [ -f \"$f\" ] && echo \"SHA-256: $(shasum -a 256 \"$f\" | cut -d' ' -f1)\"; echo \"Modified: $(stat -f%Sm -t '%Y-%m-%d %H:%M:%S' \"$f\")\"; echo \"Path: $f\"; } | pbcopy"
+    },
+    {
+      "id": "log-errors",
+      "label": "Errors",
+      "wheel": "command",
+      "accepts": [
+        "log",
+        "txt",
+        "out"
+      ],
+      "description": "Copy the last 200 lines that mention an error, fatal, exception, fail or panic",
+      "command": "out=$(grep -n -i -E 'error|fatal|exception|fail|panic' \"$INPUT\" | tail -200); [[ -n $out ]] || { echo 'No error lines found' >&2; exit 1; }; print -r -- \"$out\" | pbcopy"
+    }
+  ]
+}

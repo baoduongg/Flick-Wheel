@@ -1,0 +1,223 @@
+{
+  "title": "Developer",
+  "description": "Install builds on a simulator or phone; convert SVG, JSON and CSV for code; copy files for an LLM, diff, permalinks and checksums. Drop a folder for clone, clean, fresh install, pull, repo page, zip, sizes and lines of code.",
+  "actions": [
+    {
+      "id": "ios-install",
+      "label": "iOS Sim",
+      "wheel": "command",
+      "accepts": [
+        "app"
+      ],
+      "timeout": 300,
+      "description": "Install on the booted iOS Simulator and launch it",
+      "command": "xcrun simctl install booted \"$INPUT\" && b=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' \"$INPUT/Info.plist\") && xcrun simctl launch booted \"$b\" >/dev/null"
+    },
+    {
+      "id": "android-install",
+      "label": "Android",
+      "wheel": "command",
+      "accepts": [
+        "apk"
+      ],
+      "timeout": 300,
+      "description": "Install on the connected device or emulator",
+      "command": "export PATH=\"$PATH:$HOME/Library/Android/sdk/platform-tools\"; adb install -r \"$INPUT\""
+    },
+    {
+      "id": "svg-tsx",
+      "label": "TSX",
+      "wheel": "shift",
+      "accepts": [
+        "svg"
+      ],
+      "description": "SVG to a React TSX component (needs network on first run)",
+      "command": "t=$(mktemp -d) && npx -y @svgr/cli@8.1.0 --typescript --icon --jsx-runtime automatic --out-dir \"$t\" \"$INPUT\" && for f in \"$t\"/*.tsx; do mv \"$f\" \"$(fw_out \"$DIR/${f:t}\")\"; done"
+    },
+    {
+      "id": "json-ts",
+      "label": "TS types",
+      "wheel": "shift",
+      "accepts": [
+        "json"
+      ],
+      "description": "TypeScript types from JSON (needs network on first run)",
+      "command": "npx -y quicktype@23.2.6 \"$INPUT\" --lang ts --just-types --top-level \"$NAME\" -o \"$(fw_out \"$DIR/$NAME.types.ts\")\""
+    },
+    {
+      "id": "csv-json",
+      "label": "JSON",
+      "wheel": "shift",
+      "accepts": [
+        "csv"
+      ],
+      "description": "Convert CSV to JSON",
+      "command": "python3 -c 'import csv,json,os,sys;r=list(csv.DictReader(open(os.environ[\"INPUT\"],encoding=\"utf-8\")));json.dump(r,open(sys.argv[1],\"w\",encoding=\"utf-8\"),ensure_ascii=False,indent=2)' \"$(fw_out \"$DIR/$NAME.json\")\""
+    },
+    {
+      "id": "app-icon",
+      "label": "App icon",
+      "wheel": "shift",
+      "accepts": [
+        "png"
+      ],
+      "description": "Make a macOS .icns icon set from a PNG",
+      "command": "d=$(mktemp -d)/$NAME.iconset; mkdir -p \"$d\"; for s in 16 32 128 256 512; do sips -z $s $s \"$INPUT\" --out \"$d/icon_${s}x${s}.png\" >/dev/null; sips -z $((s*2)) $((s*2)) \"$INPUT\" --out \"$d/icon_${s}x${s}@2x.png\" >/dev/null; done; iconutil -c icns \"$d\" -o \"$(fw_out \"$DIR/$NAME.icns\")\""
+    },
+    {
+      "id": "copy-llm",
+      "label": "For LLM",
+      "wheel": "control",
+      "accepts": [
+        "*"
+      ],
+      "description": "Copy the file, or a folder tree, as a fenced block with its path for a chat",
+      "command": "if [ -d \"$INPUT\" ]; then { printf '%s\\n' \"Folder: $INPUT\" '```'; (cd \"$INPUT\" && find . -maxdepth 3 -not -path '*/.git/*' -not -path '*/node_modules/*' -not -name .DS_Store -not -name . | sort); printf '%s\\n' '```'; } | pbcopy; else [[ $(file -b --mime-encoding \"$INPUT\") != binary ]] || { echo 'Binary file: nothing to paste' >&2; exit 1; }; { printf '%s\\n' \"File: $INPUT\" \"\\`\\`\\`${INPUT:e}\"; head -c 200000 \"$INPUT\"; printf '\\n%s\\n' '```'; } | pbcopy; fi"
+    },
+    {
+      "id": "json-format",
+      "label": "Format",
+      "wheel": "command",
+      "accepts": [
+        "json"
+      ],
+      "description": "Pretty-print JSON (2 spaces) into name.pretty.json",
+      "command": "python3 -m json.tool --indent 2 \"$INPUT\" > \"$(fw_out \"$DIR/$NAME.pretty.json\")\""
+    },
+    {
+      "id": "json-minify",
+      "label": "Minify",
+      "wheel": "command",
+      "accepts": [
+        "json"
+      ],
+      "description": "Strip whitespace from JSON into name.min.json",
+      "command": "python3 -c 'import json,sys;print(json.dumps(json.load(open(sys.argv[1])),separators=(\",\",\":\"),ensure_ascii=False))' \"$INPUT\" > \"$(fw_out \"$DIR/$NAME.min.json\")\""
+    },
+    {
+      "id": "git-permalink",
+      "label": "Permalink",
+      "wheel": "control",
+      "accepts": [
+        "*"
+      ],
+      "description": "Copy a GitHub link to this file at the current commit (push it first)",
+      "command": "d=\"${INPUT:A}\"; [ -d \"$d\" ] || d=\"${d:h}\"; root=$(git -C \"$d\" rev-parse --show-toplevel 2>/dev/null) || { echo 'Not inside a git repository' >&2; exit 1; }; sha=$(git -C \"$root\" rev-parse HEAD); url=$(git -C \"$root\" remote get-url origin 2>/dev/null | sed -E 's#^git@([^:]+):#https://\\1/#; s#^ssh://git@([^/]+)/#https://\\1/#; s#\\.git$##'); [[ -n $url ]] || { echo 'No origin remote' >&2; exit 1; }; p=\"${INPUT:A}\"; rel=\"${p#$root}\"; rel=\"${rel#/}\"; if [ -d \"$p\" ]; then kind=tree; else kind=blob; fi; printf '%s/%s/%s/%s' \"$url\" \"$kind\" \"$sha\" \"$rel\" | pbcopy"
+    },
+    {
+      "id": "diff-files",
+      "label": "Diff files",
+      "wheel": "command",
+      "accepts": [
+        "*",
+        "!png",
+        "!jpg",
+        "!jpeg",
+        "!heic",
+        "!tiff",
+        "!bmp",
+        "!webp"
+      ],
+      "multi": true,
+      "description": "Compare two files in VS Code (or FileMerge); images use Image diff",
+      "command": "files=(\"${(@f)INPUTS}\"); c=\"/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code\"; if [[ -x $c ]]; then \"$c\" --diff \"${files[1]}\" \"${files[2]}\"; elif command -v opendiff >/dev/null; then opendiff \"${files[1]}\" \"${files[2]}\"; else echo 'Install VS Code or Xcode to diff files' >&2; exit 1; fi"
+    },
+    {
+      "id": "verify-sha",
+      "label": "Verify",
+      "wheel": "control",
+      "accepts": [
+        "*"
+      ],
+      "description": "Check the file against a SHA-256 you copied",
+      "command": "a=$(shasum -a 256 \"$INPUT\" | cut -d' ' -f1); b=$(pbpaste | tr -d '[:space:]' | tr 'A-F' 'a-f'); [[ ${#b} -eq 64 ]] || { echo 'Copy a SHA-256 (64 hex characters) first' >&2; exit 1; }; [[ $a == $b ]] || { echo \"SHA-256 does NOT match. File: $a Clipboard: $b\" >&2; exit 1; }"
+    },
+    {
+      "id": "git-clone",
+      "label": "Clone",
+      "wheel": "command",
+      "accepts": [
+        "dir"
+      ],
+      "timeout": 7200,
+      "description": "Clone a git repo into this folder (paste an https or ssh URL, watch the progress)",
+      "command": "open \"flickwheel://clone?path=$(perl -e 'print join q(), map { /[A-Za-z0-9_.~-]/ ? $_ : sprintf(q(%%%02X), ord) } split //, shift' \"$INPUT\")\""
+    },
+    {
+      "id": "clean-deps",
+      "label": "Clean",
+      "wheel": "command",
+      "accepts": [
+        "dir"
+      ],
+      "timeout": 900,
+      "description": "Delete node_modules, .next, __pycache__, Pods, target and other rebuildable folders (asks first)",
+      "command": "cd \"$INPUT\" || exit 1\nnames=(node_modules .next .nuxt .turbo .parcel-cache .svelte-kit __pycache__ .pytest_cache .mypy_cache .ruff_cache .gradle DerivedData Pods target .build)\nexpr=(); for n in $names; do expr+=(-o -name \"$n\"); done\nfound=(\"${(@f)$(find . -name .git -prune -o -type d \\( -name .fw-none $expr \\) -prune -print 2>/dev/null)}\")\nlist=(); for p in $found; do [[ -n $p ]] || continue; case ${p:t} in Pods) [[ -f ${p:h}/Podfile ]] || continue;; target) [[ -f ${p:h}/Cargo.toml || -f ${p:h}/pom.xml ]] || continue;; .build) [[ -f ${p:h}/Package.swift ]] || continue;; esac; list+=(\"$p\"); done\n[[ ${#list} -gt 0 ]] || { echo 'Nothing to clean here' >&2; exit 1; }\nkb=$(du -sk \"${list[@]}\" | awk '{s+=$1} END{print s}')\nmsg=\"Delete ${#list} folder(s), about $((kb/1024)) MB, inside ${INPUT:t}?\"$'\\n'; for p in ${list[1,10]}; do msg+=$'\\n'\"${p#./}\"; done; (( ${#list} > 10 )) && msg+=$'\\n'\"...and $((${#list}-10)) more\"\nMSG=$msg osascript -e 'display dialog (system attribute \"MSG\") buttons {\"Cancel\",\"Delete\"} default button \"Cancel\" cancel button \"Cancel\" with icon caution with title \"FlickWheel\"' >/dev/null || { echo Cancelled >&2; exit 1; }\nfor p in \"${list[@]}\"; do rm -rf -- \"$p\"; done"
+    },
+    {
+      "id": "git-pull",
+      "label": "Pull",
+      "wheel": "command",
+      "accepts": [
+        "dir"
+      ],
+      "timeout": 300,
+      "description": "git pull --ff-only in this repo",
+      "command": "GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND='ssh -o BatchMode=yes' git -C \"$INPUT\" pull --ff-only --quiet"
+    },
+    {
+      "id": "repo-page",
+      "label": "Repo",
+      "wheel": "command",
+      "accepts": [
+        "dir"
+      ],
+      "description": "Open the repo's origin on the web",
+      "command": "u=$(git -C \"$INPUT\" remote get-url origin 2>/dev/null | sed -E 's#^git@([^:]+):#https://\\1/#; s#^ssh://git@([^/]+)/#https://\\1/#; s#\\.git$##'); [[ $u == http*://* ]] || { echo 'No web origin remote' >&2; exit 1; }; open \"$u\""
+    },
+    {
+      "id": "zip-src",
+      "label": "Zip src",
+      "wheel": "command",
+      "accepts": [
+        "dir"
+      ],
+      "timeout": 600,
+      "description": "Zip the folder without .git, node_modules and build caches",
+      "command": "cd \"$DIR\" && zip -qr \"$(fw_out \"$DIR/${INPUT:t}-src.zip\")\" \"${INPUT:t}\" -x '*/.git/*' '*/node_modules/*' '*/.next/*' '*/Pods/*' '*/DerivedData/*' '*/.build/*' '*/__pycache__/*' '*/.DS_Store'"
+    },
+    {
+      "id": "disk-usage",
+      "label": "Sizes",
+      "wheel": "command",
+      "accepts": [
+        "dir"
+      ],
+      "timeout": 300,
+      "description": "Copy the biggest items in the folder with their sizes",
+      "command": "{ printf 'Total %s\\n' \"$(du -sh \"$INPUT\" | cut -f1)\"; (cd \"$INPUT\" && du -sh -- *(DN) | sort -rh | head -25); } | pbcopy"
+    },
+    {
+      "id": "fresh-install",
+      "label": "Fresh install",
+      "wheel": "command",
+      "accepts": [
+        "dir"
+      ],
+      "timeout": 1800,
+      "description": "Delete node_modules or Pods and reinstall from the lockfile (npm, pnpm, yarn, bun, CocoaPods, Bundler; asks first)",
+      "command": "cd \"$INPUT\" || exit 1\nrm=\nif [[ -f package.json ]]; then\n  if [[ -f pnpm-lock.yaml ]]; then i=(pnpm install --frozen-lockfile)\n  elif [[ -f yarn.lock ]]; then if [[ $(yarn --version 2>/dev/null) == 1.* ]]; then i=(yarn install --frozen-lockfile); else i=(yarn install --immutable); fi\n  elif [[ -f bun.lock || -f bun.lockb ]]; then i=(bun install --frozen-lockfile)\n  elif [[ -f package-lock.json ]]; then i=(npm ci)\n  else echo 'package.json has no lockfile to install from' >&2; exit 1; fi\n  rm=node_modules\nelif [[ -f Podfile.lock ]]; then i=(pod install); rm=Pods\nelif [[ -f Gemfile.lock ]]; then i=(bundle install)\nelse echo 'No lockfile found (npm, pnpm, yarn, bun, Podfile.lock, Gemfile.lock)' >&2; exit 1; fi\ncommand -v ${i[1]} >/dev/null || { echo \"${i[1]} is not installed\" >&2; exit 1; }\nMSG=\"Delete ${rm:-nothing} and run: ${i[*]}\"$'\\n'\"in ${INPUT:t}?\" osascript -e 'display dialog (system attribute \"MSG\") buttons {\"Cancel\",\"Reinstall\"} default button \"Cancel\" cancel button \"Cancel\" with icon caution with title \"FlickWheel\"' >/dev/null || { echo Cancelled >&2; exit 1; }\n[[ -z $rm ]] || rm -rf -- \"$rm\"\n\"${i[@]}\""
+    },
+    {
+      "id": "code-lines",
+      "label": "Lines",
+      "wheel": "command",
+      "accepts": [
+        "dir"
+      ],
+      "timeout": 300,
+      "description": "Count lines of code per language in a window, with a Copy button (respects .gitignore in a git repo)",
+      "command": "open \"flickwheel://lines?path=$(perl -e 'print join q(), map { /[A-Za-z0-9_.~-]/ ? $_ : sprintf(q(%%%02X), ord) } split //, shift' \"$INPUT\")\""
+    }
+  ]
+}

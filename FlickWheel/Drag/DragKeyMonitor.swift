@@ -5,6 +5,8 @@ final class DragKeyMonitor {
     var onWheel: ((WheelKind, [URL]) -> Void)?
     var onDragEnd: (() -> Void)?
     var onRelease: (() -> Void)?
+    // a fresh click or key press means no drag is in progress: dismiss a stuck wheel
+    var onCancel: (() -> Void)?
 
     private let dragPasteboard = NSPasteboard(name: .drag)
     private var monitors: [Any] = []
@@ -17,6 +19,12 @@ final class DragKeyMonitor {
         let handlers: [(NSEvent.EventTypeMask, (NSEvent) -> Void)] = [
             (.leftMouseDragged, { [weak self] _ in
                 Task { @MainActor in self?.handleDrag() }
+            }),
+            (.leftMouseDown, { [weak self] _ in
+                Task { @MainActor in self?.onCancel?() }
+            }),
+            (.keyDown, { [weak self] _ in
+                Task { @MainActor in self?.onCancel?() }
             }),
             (.leftMouseUp, { [weak self] _ in
                 Task { @MainActor in self?.handleMouseUp() }

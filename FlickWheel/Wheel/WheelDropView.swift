@@ -6,10 +6,14 @@ final class WheelDropView: NSView {
     var onDrop: ((WheelAction, [URL]) -> Void)?
     var onEnd: (() -> Void)?
 
-    private let hosting = NSHostingView(rootView: RadialWheelView(actions: [], hovered: nil))
-    private var actions: [WheelAction] = []
+    private let state = WheelState()
+    private lazy var hosting = NSHostingView(rootView: RadialWheelView(state: state))
+    private var actions: [WheelAction] { state.actions }
+    private var dragImageShrunk = false
     private var hovered: Int? {
-        didSet { render() }
+        get { state.hovered }
+        // @Published fires on every set; skip no-ops so mouse moves inside a segment cost nothing
+        set { if state.hovered != newValue { state.hovered = newValue } }
     }
 
     init() {
@@ -26,9 +30,20 @@ final class WheelDropView: NSView {
     }
 
     func configure(actions: [WheelAction]) {
-        self.actions = actions
-        hovered = nil
-        render()
+        dragImageShrunk = false
+        var instant = Transaction()
+        instant.disablesAnimations = true
+        withTransaction(instant) {
+            state.shown = false
+            state.puck.cursor = nil
+            state.hovered = nil
+            state.actions = actions
+        }
+    }
+
+    // flip after the first layout so the entrance animation runs from the collapsed state
+    func present() {
+        DispatchQueue.main.async { [state] in state.shown = true }
     }
 
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
@@ -40,6 +55,8 @@ final class WheelDropView: NSView {
     }
 
     override func draggingExited(_ sender: NSDraggingInfo?) {
+        dragImageShrunk = false
+        state.puck.cursor = nil
         hovered = nil
     }
 
@@ -56,22 +73,42 @@ final class WheelDropView: NSView {
             onEnd?()
             return false
         }
-        onDrop?(actions[index], urls)
+        let action = actions[index]
+        // hide now: a permission prompt can hold the drag session open, and the wheel would sit on top of it
+        onEnd?()
+        onDrop?(action, urls)
         return true
     }
 
     override func draggingEnded(_ sender: NSDraggingInfo) {
+        dragImageShrunk = false
         onEnd?()
     }
 
+    // Finder's drag image carries the file name; a long name makes a wide band that hides segments.
+    // Blank it and draw our own icon at the cursor instead (see RadialWheelView).
+    private func replaceDragImage(_ sender: NSDraggingInfo) {
+        sender.enumerateDraggingItems(options: [], for: self, classes: [NSURL.self],
+                                      searchOptions: [.urlReadingFileURLsOnly: true]) { item, _, _ in
+            item.draggingFrame = NSRect(x: 0, y: 0, width: 1, height: 1)
+            item.imageComponentsProvider = { [] }
+        }
+        let urls = sender.draggingPasteboard.readObjects(
+            forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
+        state.puck.icon = urls.first.map { NSWorkspace.shared.icon(forFile: $0.path) }
+        state.puck.fileCount = urls.count
+    }
+
     private func track(_ sender: NSDraggingInfo) -> NSDragOperation {
+        if !dragImageShrunk {
+            dragImageShrunk = true
+            replaceDragImage(sender)
+        }
+        let cursor = convert(sender.draggingLocation, from: nil)
+        state.puck.cursor = CGPoint(x: cursor.x, y: bounds.height - cursor.y)
         hovered = segmentIndex(for: sender)
         // accept anywhere in the panel so a release off-segment still reaches performDragOperation and hides the wheel
         return actions.isEmpty ? [] : .copy
-    }
-
-    private func render() {
-        hosting.rootView = RadialWheelView(actions: actions, hovered: hovered)
     }
 
     private func segmentIndex(for sender: NSDraggingInfo) -> Int? {
