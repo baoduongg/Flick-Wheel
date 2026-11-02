@@ -62,7 +62,7 @@ Built-in packs live in the app bundle (`Resources/Packs`). Add your own as `~/.c
 
 **Translate** opens a window (target language, progress per part) for a txt or md file and writes `name.<code>.ext` beside it, never over an existing file. It needs a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey), pasted in **Settings → Translate** and kept in the macOS Keychain; it is sent only to Google's API.
 
-Text, Send-ready and Clean run inside the app through `flickwheel://tool?name=ocr|send|strip|qr|diff&path=<percent-encoded path>` (repeat `path=` for the two images of `diff`). SVG to TSX and JSON to TS use `npx` with pinned versions (`@svgr/cli@8.1.0`, `quicktype@26.0.0`), so the first run needs network.
+Text, Send-ready and Clean run inside the app through `flickwheel://tool?name=ocr|send|strip|qr|diff&path=<percent-encoded path>` (repeat `path=` for the two images of `diff`). SVG to TSX and JSON to TS use `npx` with pinned versions (`@svgr/cli@8.1.0`, `quicktype@23.2.6`), so the first run needs network.
 
 ## Results and cancelling
 The menu bar icon spins while a command runs. The menu lists running jobs (**Cancel** stops the command and the ffmpeg or npx it started) and a **Recent** submenu with the last 10 results: click one to reveal its output in Finder. Clicking a success notification also reveals the output. The app finds the output as the newest file that appeared or changed beside the input.

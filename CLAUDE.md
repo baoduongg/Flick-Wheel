@@ -39,4 +39,4 @@ Tests are unhosted: `FlickWheelTests` compiles `FlickWheel/Actions` and the UI-f
 - `promo/` Remotion project (`npm run dev` to preview, `npx remotion render`) for the promo video
 
 ## Signing
-`project.yml` uses ad-hoc signing (no valid cert: the Apple Development cert in the keychain expired 2023-11), so the TCC grant resets on each rebuild. Switch `CODE_SIGN_IDENTITY` + `DEVELOPMENT_TEAM` once a valid cert exists.
+`project.yml` uses ad-hoc signing (no valid cert: the Apple Development cert in the keychain expired 2023-11), so the TCC grant resets on each rebuild. Switch `CODE_SIGN_IDENTITY` + `DEVELOPMENT_TEAM` once a valid cert exists. Hardened runtime is on (`OTHER_CODE_SIGN_FLAGS: --options=runtime`, because Xcode drops it for ad-hoc signing); the app holds the Accessibility grant, so keep other processes from injecting code into it.

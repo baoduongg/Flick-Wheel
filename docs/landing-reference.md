@@ -125,7 +125,7 @@ Pack là một file JSON chứa thêm action; không đụng tới `actions.json
 | QC | **Image diff** (hai ảnh: pixel khác tô đỏ, lưu `name-diff.png`, kèm % khác và cảnh báo khi kích thước lệch), **To MB** (nén bản ghi màn hình để vừa giới hạn dung lượng, hỏi số MB; kết quả không vượt quá), **Timecode** (ghi timecode chạy lên video), **Report** (chép tên, dung lượng, loại, kích thước hoặc thời lượng, SHA-256), **Errors** (200 dòng cuối chứa error/fatal/exception/fail/panic) |
 | Video | Các action video ở mục trên |
 
-Text/Send-ready/Clean chạy trong app qua `flickwheel://tool?name=ocr|send|strip|qr|diff&path=` (diff lặp `path=` cho hai ảnh). SVG→TSX và JSON→TS dùng `npx` với phiên bản ghim (`@svgr/cli@8.1.0`, `quicktype@26.0.0`), lần đầu cần mạng.
+Text/Send-ready/Clean chạy trong app qua `flickwheel://tool?name=ocr|send|strip|qr|diff&path=` (diff lặp `path=` cho hai ảnh). SVG→TSX và JSON→TS dùng `npx` với phiên bản ghim (`@svgr/cli@8.1.0`, `quicktype@23.2.6`), lần đầu cần mạng.
 
 ### Kết quả và hủy việc
 - Icon menu bar xoay khi có lệnh đang chạy. Menu liệt kê việc đang chạy (**Cancel** dừng lệnh và cả ffmpeg/npx nó đã mở) và mục **Recent** (10 kết quả gần nhất, bấm để hiện file trong Finder). Bấm notification thành công cũng hiện file.
@@ -184,7 +184,7 @@ Entry không hợp lệ bị bỏ qua và báo trong một notification.
 - **Accessibility**: bắt buộc (global event monitor). Hộp thoại hệ thống hiện lần đầu. Menu hiển thị trạng thái, bấm khi chưa cấp sẽ mở System Settings. Cấp sau khi mở app thì bấm status item một lần để khởi động lại monitor.
 - **Notifications**: nên cho phép để thấy kết quả.
 - **Ký số**: ký ad-hoc (`CODE_SIGN_IDENTITY: "-"`) vì chưa có cert hợp lệ. Hệ quả: quyền Accessibility **bị reset mỗi lần build lại**. Muốn giữ thì đặt `CODE_SIGN_IDENTITY` + `DEVELOPMENT_TEAM` từ cert hợp lệ.
-- Không sandbox, hardened runtime tắt.
+- Không sandbox. Hardened runtime bật (cờ `--options=runtime` đặt trong `project.yml`, vì Xcode bỏ qua khi ký ad-hoc).
 
 Build:
 ```

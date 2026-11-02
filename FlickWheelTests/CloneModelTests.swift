@@ -12,7 +12,7 @@ final class CloneModelTests: XCTestCase {
         for ok in ["https://github.com/a/b.git", "http://h/a/b", "ssh://git@h/a/b.git", "git@github.com:a/b.git"] {
             XCTAssertNil(CloneModel.urlProblem(ok), ok)
         }
-        for bad in ["", "ext::sh -c id", "file:///tmp/x", "/tmp/x", "--upload-pack=x", "https://github.com", "git@github.com"] {
+        for bad in ["", "ext::sh -c id", "file:///tmp/x", "/tmp/x", "--upload-pack=x", "https://github.com", "git@github.com", "ssh://-oProxyCommand=id/x", "git://-x/y"] {
             XCTAssertNotNil(CloneModel.urlProblem(bad), bad)
         }
     }

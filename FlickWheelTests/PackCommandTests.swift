@@ -45,6 +45,30 @@ final class PackCommandTests: XCTestCase {
         XCTAssertTrue(ids.isSuperset(of: ["img-diff", "vid-target", "vid-timecode", "file-report", "unzip", "img-qr", "copy-llm", "verify-sha"]))
     }
 
+    func testPermalinkAndRepoPageDropCredentialsFromTheRemote() throws {
+        for id in ["git-permalink", "repo-page"] {
+            let command = try action(id).command
+            let expression = try XCTUnwrap(command.range(of: #"sed -E '[^']*'"#, options: .regularExpression).map { String(command[$0]) }, id)
+            let cases = [
+                ("https://user:tok@github.com/a/b.git", "https://github.com/a/b"),
+                ("git@github.com:a/b.git", "https://github.com/a/b"),
+                ("ssh://git@host/a/b.git", "https://host/a/b"),
+                ("https://github.com/a/b", "https://github.com/a/b"),
+            ]
+            for (remote, want) in cases {
+                let p = Process()
+                p.executableURL = URL(fileURLWithPath: "/bin/zsh")
+                p.arguments = ["-c", "printf '%s' \"$REMOTE\" | " + expression]
+                p.environment = ["REMOTE": remote]
+                let out = Pipe()
+                p.standardOutput = out
+                try p.run()
+                p.waitUntilExit()
+                XCTAssertEqual(String(decoding: out.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self), want, "\(id): \(remote)")
+            }
+        }
+    }
+
     func testUnzipExtractsIntoAFreeFolder() async throws {
         let dir = try scratch()
         try FileManager.default.createDirectory(at: dir.appendingPathComponent("src/inner"), withIntermediateDirectories: true)

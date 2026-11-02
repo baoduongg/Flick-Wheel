@@ -401,7 +401,7 @@
 			path = Drag;
 			sourceTree = "<group>";
 		};
-		"TEMP_3BE14E15-C6F6-455F-B745-AAB1E18FA433" /* Resources */ = {
+		"TEMP_7A5754C2-E31E-4B20-A360-3EE393A2A41E" /* Resources */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -772,12 +772,13 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = FlickWheel/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				OTHER_CODE_SIGN_FLAGS = "--options=runtime";
 				PRODUCT_BUNDLE_IDENTIFIER = com.baoduongg.flickwheel;
 				SDKROOT = macosx;
 			};
@@ -790,12 +791,13 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = FlickWheel/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				OTHER_CODE_SIGN_FLAGS = "--options=runtime";
 				PRODUCT_BUNDLE_IDENTIFIER = com.baoduongg.flickwheel;
 				SDKROOT = macosx;
 			};
