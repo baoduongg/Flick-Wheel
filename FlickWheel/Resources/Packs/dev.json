@@ -102,7 +102,7 @@
         "*"
       ],
       "description": "Copy a GitHub link to this file at the current commit (push it first)",
-      "command": "d=\"${INPUT:A}\"; [ -d \"$d\" ] || d=\"${d:h}\"; root=$(git -C \"$d\" rev-parse --show-toplevel 2>/dev/null) || { echo 'Not inside a git repository' >&2; exit 1; }; sha=$(git -C \"$root\" rev-parse HEAD); url=$(git -C \"$root\" remote get-url origin 2>/dev/null | sed -E 's#^git@([^:]+):#https://\\1/#; s#^ssh://git@([^/]+)/#https://\\1/#; s#\\.git$##'); [[ -n $url ]] || { echo 'No origin remote' >&2; exit 1; }; p=\"${INPUT:A}\"; rel=\"${p#$root}\"; rel=\"${rel#/}\"; if [ -d \"$p\" ]; then kind=tree; else kind=blob; fi; printf '%s/%s/%s/%s' \"$url\" \"$kind\" \"$sha\" \"$rel\" | pbcopy"
+      "command": "d=\"${INPUT:A}\"; [ -d \"$d\" ] || d=\"${d:h}\"; root=$(git -C \"$d\" rev-parse --show-toplevel 2>/dev/null) || { echo 'Not inside a git repository' >&2; exit 1; }; sha=$(git -C \"$root\" rev-parse HEAD); url=$(git -C \"$root\" remote get-url origin 2>/dev/null | sed -E 's#^git@([^:]+):#https://\\1/#; s#^ssh://git@([^/]+)/#https://\\1/#; s#^(https?://)[^/@]*@#\\1#; s#\\.git$##'); [[ -n $url ]] || { echo 'No origin remote' >&2; exit 1; }; p=\"${INPUT:A}\"; rel=\"${p#$root}\"; rel=\"${rel#/}\"; if [ -d \"$p\" ]; then kind=tree; else kind=blob; fi; printf '%s/%s/%s/%s' \"$url\" \"$kind\" \"$sha\" \"$rel\" | pbcopy"
     },
     {
       "id": "diff-files",
@@ -173,7 +173,7 @@
         "dir"
       ],
       "description": "Open the repo's origin on the web",
-      "command": "u=$(git -C \"$INPUT\" remote get-url origin 2>/dev/null | sed -E 's#^git@([^:]+):#https://\\1/#; s#^ssh://git@([^/]+)/#https://\\1/#; s#\\.git$##'); [[ $u == http*://* ]] || { echo 'No web origin remote' >&2; exit 1; }; open \"$u\""
+      "command": "u=$(git -C \"$INPUT\" remote get-url origin 2>/dev/null | sed -E 's#^git@([^:]+):#https://\\1/#; s#^ssh://git@([^/]+)/#https://\\1/#; s#^(https?://)[^/@]*@#\\1#; s#\\.git$##'); [[ $u == http*://* ]] || { echo 'No web origin remote' >&2; exit 1; }; open \"$u\""
     },
     {
       "id": "zip-src",

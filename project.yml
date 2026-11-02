@@ -22,7 +22,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.baoduongg.flickwheel
         INFOPLIST_FILE: FlickWheel/Resources/Info.plist
-        ENABLE_HARDENED_RUNTIME: NO
+        ENABLE_HARDENED_RUNTIME: YES
+        # Xcode skips the runtime flag for ad-hoc signing, so pass it by hand
+        OTHER_CODE_SIGN_FLAGS: "--options=runtime"
         CODE_SIGN_STYLE: Manual
         CODE_SIGN_IDENTITY: "-"
   FlickWheelTests:

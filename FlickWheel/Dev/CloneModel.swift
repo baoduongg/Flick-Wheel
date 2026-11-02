@@ -73,9 +73,9 @@ final class CloneModel: ObservableObject {
 
     var canStart: Bool { !running && !trimmedURL.isEmpty && problem == nil }
 
-    // https, http, ssh and git URLs, plus scp-style git@host:owner/repo; nothing else reaches git
+    // https, http, ssh and git URLs, plus scp-style git@host:owner/repo; nothing else reaches git; a host starting with "-" would be read by ssh as an option
     nonisolated static func urlProblem(_ url: String) -> String? {
-        let ok = url.range(of: #"^(https?|ssh|git)://[^\s/]+/\S+$"#, options: .regularExpression) != nil
+        let ok = url.range(of: #"^(https?|ssh|git)://[^\s/-][^\s/]*/\S+$"#, options: .regularExpression) != nil
             || url.range(of: #"^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+:\S+$"#, options: .regularExpression) != nil
         return ok ? nil : "Use an https:// or ssh URL, e.g. git@github.com:owner/repo.git"
     }
